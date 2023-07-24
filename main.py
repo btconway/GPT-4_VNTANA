@@ -401,7 +401,7 @@ VNTANA_search_tool = StructuredTool.from_function(
 )
 
 retry_parser = RetryWithErrorOutputParser.from_llm(
-    parser=CustomOutputParser(), llm=OpenAI(temperature=0)
+    parser=CustomOutputParser(), llm=OpenAI(temperature=0, model="gpt-4")
 )
 
 
@@ -418,7 +418,7 @@ tools.append(VNTANA_search_tool)
 # Create the agent and run it
 st_container = st.container()
 llm = ChatOpenAI(
-    temperature=0.3, 
+    temperature=0, 
     callbacks=[StreamlitCallbackHandler(parent_container=st_container, expand_new_thoughts=False, collapse_completed_thoughts=True)], 
     streaming=True
 )
