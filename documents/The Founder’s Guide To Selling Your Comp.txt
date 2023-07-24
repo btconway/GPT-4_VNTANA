@@ -1,0 +1,101 @@
+The Founder’s Guide To Selling Your Company
+1
+1 Reactions
+0 comments
+Powerup
+November 10, 2014
+
+For most founders, selling a company is a life changing event that they have had no training for. At Y Combinator, one big thing we help our startups with is navigating questions around the acquisition process. Originally, I wrote this guide for YC startups outlining what I’ve learned in my last ten years as an entrepreneur about selling startups. If you are going through an acquisition, hopefully this will be useful to you.
+
+When to Sell
+
+Similar to raising money, the best time to sell your startup is when you don’t need to or want to. Paradoxically, you are probably thinking about selling your startup as you are experiencing a lack of traction, tough competition, or difficult time fundraising. However, this is a bad time to sell your startup: you will have few bidders and be more likely to acquiesce to the demands of anyone who does show up.
+
+The best time to sell your startup is when you have many options. These options don’t all have to be acquisition offers, they can also be venture term sheets for your next round. You might even be operating profitably and find yourself in the enviable position of confidently being able to turn down an offer. Usually, you will have these options because your startup is actually experiencing great traction; counterintuitively, the best way to “build to flip” is actually the same as building a successful company.
+
+The following is a brief overview of the steps that go into valuing your company, garnering interest in it and navigating through the acquisition process.
+
+Starting Acquisition Talks
+
+Do not enter acquisition talks unless you are ready to sell your company. Negotiating an acquisition is the most distracting thing you can do in a startup: going through M&A is an order of magnitude more distracting than raising money. All of your ability to run the day-to-day operations of your company will grind to a halt. You should only enter an acquisition process if 1) you are certain you want to sell the company and 2) you are likely to get a price you will accept. Don’t talk to potential acquirers “just to see what price you can get.”
+
+How Your Startup Will be Valued
+
+Investors value companies based on either their financial value or their strategic value. A company’s financial value hinges on its profits and model of its future cash flows. For the vast majority of startups in tech, this will be zero. It is much more likely is that your startup will be valued based on where it fits in with the acquiring company’s short or long term strategy. Here are some surprisingly common reasons your startup has strategic value to an acquirer:
+
+The CEO finds it interesting, or wants to keep it away from another large tech company.
+The executive that runs the relevant division of the acquirer needs to demonstrate “big moves.”
+A competitor to an acquirer is out-executing it in a business and you can help the acquirer become better.
+The acquirer doesn’t have or can’t retain talent in an area where you have employees.
+Your businesses actually have some synergies and combining them is theoretically value-accretive.
+The acquirer is running a similar business but you are executing much better. They are afraid of you.
+If some of these reasons seem ridiculous and arbitrary, it is because sometimes they are. Remember that companies are bought, not sold: in order for a company to want to buy you, an internal champion will have to internalize one of these reasons. This isn’t something that can be forced.
+
+When it comes to setting price, there is no “right” price for a company, there is only the price that you can negotiate. Management teams, investment bankers and corporate development people will concoct an array of metrics — like cost per user — to justify a number. Ultimately, though, the clearing price for a startup depends on what the big company can justify to the market (previous comparable acquisitions are a good benchmark) and the sale price agreed to by you and your investors.
+
+A potential acquirer’s first offer is rarely its best offer. Don’t be afraid to say “no” — the potential acquirer isn’t going anywhere. There are many negotiation strategies, but in order to extract the most value you need to (1) be willing to walk away and (2) initiate a competitive bidding process.
+
+Getting Offers
+
+The best way to solicit acquisition offers is to have ongoing conversations with potential acquirers about ways you can work together. These conversations usually involve many different people within a big company; you’ll only get an offer once a sufficiently high-up decision maker is convinced that buying you is a better idea than partnering with you.
+
+When you have an offer, the next thing to do is determine your alternative options. You can do this by letting other potential acquirers (including larger companies you have partnered with and/or competitors to the acquirer) know that you have received a term sheet from an acquirer and you are considering selling yourself, but would prefer a longer term future with their company (find a reason). Now would also be a good time to call up VCs you have been talking to and ask for a term sheet for your next round.
+
+Sometimes, a company you are doing a critical business development partnership with will insist on a “cool down period” in an agreement. This is a period of time during which you have to wait once you’ve received an acquisition offer before you can sign (for your partner to theoretically prepare a better counter offer). Cool down clauses can actually work in your favor as a way to acquire additional offers once you’ve received a first term sheet.
+
+Bullshit Offers
+
+Most of the offers you will receive to buy your startup will be bullshit offers. It costs a company exactly zero dollars to tell you: “we want to buy your startup.” In fact, companies employ teams of people, under the euphemism Corporate Development, to go around the Valley and repeat this phrase to founders.
+
+Bullshit offers are dangerous because they can lull you into a false sense that you are being successful. Like TechCrunch articles, bullshit offers are a vanity metric, not an actual measure of success.
+
+You can tell if an offer is bullshit because it will not be accompanied by an expiration date and/or a promise of a term sheet delivery within a very short period of time (24–48 hours). When a sufficiently high-up decision maker decides he/she wants to buy your startup, he/she will attempt to meet with you constantly and put time pressure on you, so as to prevent you from shopping the deal and getting a better offer. The absence of this behavior indicates the other company is not serious about acquiring your business.
+
+Often the expectations of the founders and corporate development people are very divergent. Before proceeding far into conversations with big acquirers, you should try to clarify valuation expectations (and other important consideration details, like retention packages) as quickly as possible. This strategy should help prevent you from having half a dozen meetings, only to find out the potential acquirer expects to pay $10 million for your rapidly growing startup that already has a term sheet for a $15 million A round.
+
+Hiring a Banker
+
+Like the world of venture capital, investment banking is a field filled with a very small number of extremely well-connected, analytical and experienced people and a much larger number people pretending to be those things. It is unlikely you will be able to find someone in the former category unless your startup’s realistic selling price is in the mid-hundreds of millions or above. But the good news is that you probably don’t need an investment banker at all unless your selling price is that high, and maybe not even then.
+
+Investment bankers are expensive (1 to 2% of the total deal value). However, the good ones can help you get a thorough understanding of the competitive landscape, who the individual decision makers are at every potential acquirer, and what buttons to push to maximize your deal value. Also, the people you are negotiating with in corporate development are professional negotiators: they spend all day every day trying to pay less for target companies. You have probably spent a lot of time doing things that are not negotiating. Having a professional negotiator on your side is often extremely valuable, if you can get someone good.
+
+Pre-Term Sheet Diligence
+
+If you are committed to going through an acquisition process, you should be fairly free with your company data (under an NDA), as it is better that the acquirer uncover any red flags before you’ve signed a term sheet and entered the closing process. However, if the potential acquirer asks to interview your team you should absolutely refuse (unless you are going through a talent acquisition and have no other options). Letting a potential acquirer interview your team is extremely distracting for them, and signals to the acquirer that you are willing to bend over.
+
+Signing a Term Sheet
+
+Once you have collected all your term sheets, you can sign one. Before you do, you should try to negotiate the business and legal points in as much detail as possible. Feel free to push back on exploding offer deadlines and other pressure to sign immediately. After you sign, you can expect any points that weren’t previously negotiated will end up with language in favor of the acquirer.
+
+As the startup, you have all the leverage before you sign a term sheet. Once you sign, you have almost no leverage at all. This is mental: before you sign a term sheet, you haven’t yet decided to sell. Once you do, you have committed to selling the deal to yourself, your employees and investors. Once you get negotiation fatigue — and maybe even before — you will start to agree quickly to things you wouldn’t have considered at the term sheet stage. Also, once you’ve signed a term sheet you can no longer shop your company to other acquirers. If your deal falls apart, other acquirers may have cooled off or think that the deal fell through because your company is damaged goods. It may be impossible to resuscitate your other options.
+
+When negotiating a term sheet, push for a shortest possible closing period (target 30 days) to avoid getting deal fatigue and to put pressure on the acquirer (although, be aware that sometimes a regulatory issue will dictate the timing of the closing and that is outside of everyone’s control). A short closing period will also help you somewhat limit the distraction from your main job: running your startup.
+
+Before you sign a term sheet that commits you to either working at the acquirer or accepting the acquirer’s stock as consideration for the acquisition, ask yourself if you actually believe in the company. The Valley is replete with cautionary tales of startups that sold themselves in exchange for the stock of ultimately worthless acquirers. Don’t let yourself become another one.
+
+Just because you signed a term sheet does not mean your deal is done; in fact, it is very possible that it will still fall apart. Despite a commitment to trying to close, companies change their minds all the time during the diligence process. If your deal fails and the result is that your startup is collateral damage because you were distracted, remember that this is probably an acceptable outcome for the would-have-been acquirer.
+
+Closing
+
+The most dangerous stretch during the acquisition process is the time between when you decide you are going to sell, and when the sale actually occurs. You’ve decided to exchange stress for riches, and you can already see that new house on the horizon (and maybe one for your parents).
+
+What happens when the acquirer comes back and changes the total deal value?
+
+What happens when the acquirer changes its mind, and you have to go back to the grind?
+
+What happens when the acquirer has talked to your senior management, and then decided your team isn’t good enough?
+
+If you are running low on cash, what happens when you run out of cash before the deal closes, because negotiating the deal documents took twice as long as you expected?
+
+These things happen. You should be prepared to walk away from any deal up until the point where you are watching your bank account, waiting for the wire transfer from the acquirer to hit.
+
+Getting to closing is a process largely driven by lawyers. The items to be negotiated are typically divided into legal points and business points — the lawyers will resolve the legal points, but you are expected to figure out the business issues. Remember that you are ultimately responsible for the outcome, and that the lawyers work for you (and usually get paid if the deal happens or not). You have to stay on top of the lawyers to make sure that they aren’t slowing down the deal by getting bogged down in details that don’t actually make any difference to you or your stakeholders.
+
+In Summary
+
+Entering the acquisition process is one of the most dangerous things an early stage startup can do, because the process is distracting, demoralizing, and usually involves giving your competition most of your proprietary business data. Founders who have been through the process have said it is ten times as distracting as fundraising. It often cripples your ability to oversee the business operations. Do not enter into an acquisition process lightly.
+
+Carolyn Levy, Jon Levy and Emmett Shear helped contribute to and edit this post. Thanks!
+
+Disagree with anything I’ve posted? Let me know on Twitter.
+
