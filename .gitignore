@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+custom_agent_optmized.py
+
 # Distribution / packaging
 .Python
 build/
