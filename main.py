@@ -53,7 +53,7 @@ from langchain.schema import (
 from langchain.tools import StructuredTool
 from langchain.tools.base import BaseTool
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)  # Changed to DEBUG level to capture more details
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)  # Changed to DEBUG level to capture more details
 logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
 LANGCHAIN_TRACING = tracing_enabled(True)
