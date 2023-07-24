@@ -20,7 +20,6 @@ from langchain.agents import (
     load_tools
 )
 from langchain.output_parsers import RetryOutputParser, RetryWithErrorOutputParser
-from gptcache.embedding import OpenAI
 from langchain.agents.agent import Agent
 from langchain.agents.utils import validate_tools_single_input
 from langchain.callbacks.base import BaseCallbackHandler
