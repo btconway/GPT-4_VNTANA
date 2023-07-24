@@ -1,0 +1,44 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2709
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\csgray\c0;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs22 \cf2 \CocoaLigature0 VNTANA Optimizer FAQ \
+\
+Question: How much of your model optimization process is automated? How long does it take per model? \
+Answer: Our model processing technology is 100% automated and modular. There is 0 manual intervention other than selecting your optimization settings or a preset. We allow users to select maximum texture size, image type (original, JPEG, or KTX), desired polycount, draco compression and more. All of the selections can be easily aggregated into presets for a user. We input OBJ, STL, FBX, scanned USD and glTF files as input, and output GLB and USDZ (and soon game-engine ready FBX files). Modularity is achieved through the concept of Pipelines, where each Pipeline can define behaviour for the entire model processing software. Through Pipelines we are able to provide custom behavior depending on clients need, or we may leverage prior knowledge about the asset structure (e.g. 3D scan vs CAD asset). The optimizer itself consists of around 50 flags which can be turned off or on depending on the needs of the user and be deployed via a pipeline. The entire model processing takes from 1 to 10 minutes, depending on model size/structure. Browzwear and Clo files usually take 3-5 minutes to process on average. \
+\
+Question: What plug-ins do you offer? \
+\
+Answer: We regard to design programs, we have built custom plug-ins for Browzwear, Clo, and soon Keyshot. These plug-ins allow a user to upload directly to VNTANA without leaving the design program and also automatically select the ideal export settings for the specific design program to save the user time and avoid any potential export mistakes. The plug-ins also allow the user to process batch uploads which is enormously helpful for some of our clients like VF Corp who may process hundreds or thousands of assets at a time. \
+We also have plug-ins for Unreal Engine and Unity that allow users to access & search all of their assets on VNTANA and pull in optimized FBX files into the game engine. \
+\
+Question: For model optimization what do you feel are your most unique attributes? \
+\
+Answer: Some of our most unique attributes are the granular level of control we have over the optimizer as well as our automation. Competitors who claim to have "optimization" almost always require some 3D knowledge and manual work to optimize an asset. Our optimization is fully automated. Additionally, no one supports optimizing assets from the fashion industry better than we do. We not only fix issues inherent to exports from these programs (e.g. automatically padding textures for Browzwear assets), but we also have tested on tens of thousands of these types of assets and have built our optimizer specifically to support them. For instance, "small feature baking" is a feature of our optimizer that allows us to automatically detect and convert stitches in apparel and footwear assets from geometry to textures with a baked normal map. This is how we're able to take a 7M poly shoe and automatically reduce it to under 100k while still preserving the structure of the asset (you can find a link to the original FBX here). \
+Another key difference over other optimization solutions is that our decimation algorithm does not retopologize geometry but relies on atomic decimation operations. This allows us to have a higher degree of control over which areas of the mesh we decimate, as well as the ability to consider arbitrary properties of the geometry and the materials when decimating. \
+For example, our algorithm can preserve hard edges, choose to decimate metallic surfaces less than dielectric ones, or preserve material boundaries on the assets. \
+\
+Question: Do you have technology to detect illegal geometry for iOS and Android AR specifications? Things like non manifold geo, polys without UV, floating vertices etc\'85 \
+Yes we do detect all of them. We don't treat them as hard failures by default but attempt to sanitize them. We could of course configure a Pipeline where failure to sanitize illegal AR geometry results in a hard processing failure. \
+\
+\
+Question: How do you identify and cull internal geometry and parts that may be well made just not required for visualization? Are you using any kind of voxelization? \
+Answer: We do not perform voxelization at all, but we do remove obstructed geometry, i.e. geometry that is not visible by an outside camera from any angle. Our proprietary obstructed geometry removal algorithm correctly handles transparent and alpha-masked materials. \
+\
+Question: What do you do when a model has 3-10+ materials each with standard PBR shading channels? How do you reduce this to 1-2 materials with textures having sufficient texel space to retain product surface details? \
+Answer: We employ a number of different techniques that aim to reduce the material/draw call count for the asset. These include texture/normal baking with UV unwrapping and other techniques which aim to fit a material's UV space into a [0, 1] box. Such materials are then atlased into larger texture bins, effectively merging multiple materials into one. \
+\
+Question: Do you have a process to reduce total object count within models? \
+\
+Answer: Yes, we merge meshes and materials where applicable, this is closely related to the question above. \
+\
+Question: Do you have poly reduction or optimization tools? Could you describe that technology? \
+\
+Answer: Yes, we employ various poly count reduction techniques such as Small Feature Baking, Obstructed Geometry Removal, Mesh Instance Detection, and Polygon Decimation. \
+These techniques are proprietary so we cannot share details, but we'd be happy to share some results on assets pre and post optimization so you can get a feel for what our output looks like. \
+In addition to optimization, we sanitize assets prior to optimization. In this process we can clean up flipped normals, merge meshes, and fix certain UV issues. \
+Quetion: Is your model optimization process fully custom/proprietary technology? \
+Answer: Yes, it is fully proprietary and patented technology. }
