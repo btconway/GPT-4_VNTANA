@@ -19,7 +19,7 @@ from langchain.agents import (
     AgentOutputParser, 
     load_tools
 )
-from langchain.output_parsers import RetryOutputParser, RetryWithErrorOutputParser
+from langchain.output_parsers import RetryWithErrorOutputParser
 from langchain.agents.agent import Agent
 from langchain.agents.utils import validate_tools_single_input
 from langchain.callbacks.base import BaseCallbackHandler
@@ -118,10 +118,9 @@ Remember, you work for VNTANA and everything you do should be viewed in that con
 Continuously review and analyze your actions to ensure you are performing to the best of your abilities.
 Constructively self-criticize your big-picture behavior constantly.
 Reflect on past decisions and strategies to refine your approach.
-You should only respond in JSON format as described below:
+You should only respond in the format as described below:
 Response Format:
 {format_instructions}
-Ensure the response can be parsed by Python json.loads
 """
 FORMAT_INSTRUCTIONS ="""To use a tool, please use the following format:
 
@@ -168,49 +167,26 @@ def preprocess_json_input(input_str: str) -> str:
 
 class CustomOutputParser(AgentOutputParser):
     def parse(self, llm_output: str) -> Union[AgentAction, AgentFinish]:
-        # Check if the output is in JSON format
-        if llm_output.strip().startswith('{') and llm_output.strip().endswith('}'):
-            try:
-                parsed = json.loads(llm_output, strict=False)
-            except json.JSONDecodeError:
-                preprocessed_text = preprocess_json_input(llm_output)
-                try:
-                    parsed = json.loads(preprocessed_text, strict=False)
-                except Exception:
-                    raise ValueError(f"Could not parse LLM output: `{llm_output}`")
-
-            # If "tool" key exists, return an AgentAction
-            if "tool" in parsed and "name" in parsed["tool"]:
-                return AgentAction(tool=parsed["tool"]["name"], tool_input=parsed["tool"]["input"], log=llm_output)
-
-            # If "ai_response" key exists, return its value as output
-            if "ai_response" in parsed:
-                return AgentFinish(
-                    return_values={"output": parsed["ai_response"]},
-                    log=llm_output,
-                )
-
-            # If "ai" key exists, return its value as output
-            if "ai" in parsed:
-                return AgentFinish(
-                    return_values={"output": parsed["ai"]},
-                    log=llm_output,
-                )
-
-            # If neither key exists, return the full LLM output
+        # Check if the output contains the prefix "AI:"
+        if "AI:" in llm_output:
             return AgentFinish(
-                return_values={"output": llm_output},
+                return_values={"output": llm_output.split("AI:")[-1].strip()},
                 log=llm_output,
             )
 
-        else:
-            # If the output is not in JSON format, handle it accordingly
-            # For example, you might want to return it as is
-            return AgentFinish(
-                return_values={"output": llm_output},
-                log=llm_output,
-            )
+        # If the prefix is not found, use a regular expression to extract the action and action input
+        regex = r"Action: (.*?)[\n]*Action Input: (.*)"
+        match = re.search(regex, llm_output)
+        if match:
+            action = match.group(1)
+            action_input = match.group(2)
+            return AgentAction(action.strip(), action_input.strip(" ").strip('"'), llm_output)
 
+        # If neither condition is met, return the full LLM output
+        return AgentFinish(
+            return_values={"output": llm_output},
+            log=llm_output,
+        )
 
 # Define the custom agent
 class CustomChatAgent(Agent):
@@ -455,8 +431,28 @@ def parse_ai_response(response_dict):
         if match:
             ai_response = match.group(1)
 
+    # Extract the actual response after "Observation: "
+    observation_index = ai_response.find("Observation: ")
+    if observation_index != -1:
+        ai_response = ai_response[observation_index + len("Observation: "):]
+    else:
+        ai_response = "Observation not found in response."
+
+    # Remove any leading or trailing whitespace
+    ai_response = ai_response.strip()
+
     return ai_response
 
+
+    # Extract the actual response after "Observation: "
+    observation_index = ai_response.find("Observation: ")
+    if observation_index != -1:
+        ai_response = ai_response[observation_index + len("Observation: "):]
+
+    # Remove any leading or trailing whitespace
+    ai_response = ai_response.strip()
+
+    return ai_response
 
 def is_json(myjson):
     try:
