@@ -20,6 +20,7 @@ from langchain.agents import (
     load_tools
 )
 from langchain.output_parsers import RetryOutputParser, RetryWithErrorOutputParser
+from gptcache.embedding import OpenAI
 from langchain.agents.agent import Agent
 from langchain.agents.utils import validate_tools_single_input
 from langchain.callbacks.base import BaseCallbackHandler
@@ -73,6 +74,7 @@ client = weaviate.Client(
      additional_headers={
         "X-Openai-Api-Key": openai_api_key}
 )
+openai = OpenAI(model)
 
 # Define the prompt template
 PREFIX = """
@@ -109,6 +111,8 @@ For step 4, explain how VNTANA has solved similar challenges for other customers
 For step 5, ask if a conversation to solve their challenges is worthwhile.
 
 After generating a response for each step, assemble these responses into a complete email.
+
+If, you are asked to write an email generally, keep it short but highlighting a customer's pain if you know it. If you don't know the pain, it can be more generic but usually shouldn't exceed 2 paragraphs.
 
 If the user mentions VNTANA or asks for information about VNTANA you always use your tools because you know nothing about them. You should always use a tool on your first request from a user:
 
