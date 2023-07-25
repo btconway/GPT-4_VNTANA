@@ -19,7 +19,7 @@ from langchain.agents import (
     AgentOutputParser, 
     load_tools
 )
-from langchain.output_parsers import RetryOutputParser, RetryWithErrorOutputParser
+from langchain.output_parsers import RetryWithErrorOutputParser
 from langchain.agents.agent import Agent
 from langchain.agents.utils import validate_tools_single_input
 from langchain.callbacks.base import BaseCallbackHandler
@@ -32,6 +32,7 @@ from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings import OpenAIEmbeddings
 import langchain
+import redis
 from langchain.cache import RedisSemanticCache
 from langchain.llms import OpenAI
 from langchain.memory import ConversationBufferMemory
@@ -52,7 +53,7 @@ from langchain.schema import (
 from langchain.tools import StructuredTool
 from langchain.tools.base import BaseTool
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)  # Changed to DEBUG level to capture more details
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)  # Changed to DEBUG level to capture more details
 logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
 LANGCHAIN_TRACING = tracing_enabled(True)
@@ -72,8 +73,6 @@ client = weaviate.Client(
      additional_headers={
         "X-Openai-Api-Key": openai_api_key}
 )
-
-ai_prefix = "VNTANA AI"
 
 # Define the prompt template
 PREFIX = """
@@ -138,7 +137,7 @@ When you have a response to say to the Human, or if you do not need to use a too
 
 ```
 Thought: Do I need to use a tool? No
-{ai_prefix}: [your response here]
+"VNTANA AI": [your response here]
 ```"""
 
 SUFFIX = """Begin!
@@ -150,6 +149,7 @@ New input: {input}
 {agent_scratchpad}"""
 
 chat_history = []
+
 
 def preprocess_json_input(input_str: str) -> str:
     """Preprocesses a string to be parsed as json.
@@ -170,49 +170,26 @@ def preprocess_json_input(input_str: str) -> str:
 
 class CustomOutputParser(AgentOutputParser):
     def parse(self, llm_output: str) -> Union[AgentAction, AgentFinish]:
-        # Check if the output is in JSON format
-        if llm_output.strip().startswith('{') and llm_output.strip().endswith('}'):
-            try:
-                parsed = json.loads(llm_output, strict=False)
-            except json.JSONDecodeError:
-                preprocessed_text = preprocess_json_input(llm_output)
-                try:
-                    parsed = json.loads(preprocessed_text, strict=False)
-                except Exception:
-                    raise ValueError(f"Could not parse LLM output: `{llm_output}`")
-
-            # If "tool" key exists, return an AgentAction
-            if "tool" in parsed and "name" in parsed["tool"]:
-                return AgentAction(tool=parsed["tool"]["name"], tool_input=parsed["tool"]["input"], log=llm_output)
-
-            # If "ai_response" key exists, return its value as output
-            if "ai_response" in parsed:
-                return AgentFinish(
-                    return_values={"output": parsed["ai_response"]},
-                    log=llm_output,
-                )
-
-            # If "ai" key exists, return its value as output
-            if "ai" in parsed:
-                return AgentFinish(
-                    return_values={"output": parsed["ai"]},
-                    log=llm_output,
-                )
-
-            # If neither key exists, return the full LLM output
+        # Check if the output contains the prefix "AI:"
+        if "AI:" in llm_output:
             return AgentFinish(
-                return_values={"output": llm_output},
+                return_values={"output": llm_output.split("AI:")[-1].strip()},
                 log=llm_output,
             )
 
-        else:
-            # If the output is not in JSON format, handle it accordingly
-            # For example, you might want to return it as is
-            return AgentFinish(
-                return_values={"output": llm_output},
-                log=llm_output,
-            )
+        # If the prefix is not found, use a regular expression to extract the action and action input
+        regex = r"Action: (.*?)[\n]*Action Input: (.*)"
+        match = re.search(regex, llm_output)
+        if match:
+            action = match.group(1)
+            action_input = match.group(2)
+            return AgentAction(action.strip(), action_input.strip(" ").strip('"'), llm_output)
 
+        # If neither condition is met, return the full LLM output
+        return AgentFinish(
+            return_values={"output": llm_output},
+            log=llm_output,
+        )
 
 # Define the custom agent
 class CustomChatAgent(Agent):
@@ -367,7 +344,7 @@ def create_VNTANA_search(human_text):
     messages = [
         {
             "role": "system",
-            "content": "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search, your task is to generate relevant search concepts from input of a VNTANA salesperson. These concepts should be focused on key aspects of VNTANA's services, including but not limited to optimization algorithms, 3D workflows, digital transformation, and use of 3D designs in various channels. If the user asks you to write in a particular style, for example, 'write this in the style of Chris Orlob', you should include 'Chris Orlob Sales Style' as one of your search terms. The goal is to inform a subsequent AI, which will assist in composing response to the VNTANA salesperson’s request. These concepts should be separated by commas."
+            "content": "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate relevant search concepts from input of a VNTANA salesperson. These concepts should be focused on key aspects of VNTANA's services, including but not limited to optimization algorithms, 3D workflows, digital transformation, and use of 3D designs in various channels. The goal is to inform a subsequent AI, which will assist in composing response to the VNTANA salesperson’s request. Please generate a list of 3 relevant concepts based on the following meeting summary. These concepts should be separated by commas."
         },
         {"role": "user", "content": "Please generate your semantic search query."},
         {"role": "assistant", "content": human_text}
@@ -401,7 +378,7 @@ VNTANA_search_tool = StructuredTool.from_function(
 )
 
 retry_parser = RetryWithErrorOutputParser.from_llm(
-    parser=CustomOutputParser(), llm=OpenAI(temperature=0, model="gpt-4")
+    parser=CustomOutputParser(), llm=OpenAI(temperature=0)
 )
 
 
@@ -418,7 +395,7 @@ tools.append(VNTANA_search_tool)
 # Create the agent and run it
 st_container = st.container()
 llm = ChatOpenAI(
-    temperature=0, 
+    temperature=0.3, 
     callbacks=[StreamlitCallbackHandler(parent_container=st_container, expand_new_thoughts=False, collapse_completed_thoughts=True)], 
     streaming=True
 )
@@ -461,6 +438,22 @@ def parse_ai_response(response_dict):
     observation_index = ai_response.find("Observation: ")
     if observation_index != -1:
         ai_response = ai_response[observation_index + len("Observation: "):]
+    else:
+        ai_response = "Observation not found in response."
+
+    # Remove any leading or trailing whitespace
+    ai_response = ai_response.strip()
+
+    return ai_response
+
+
+    # Extract the actual response after "Observation: "
+    observation_index = ai_response.find("Observation: ")
+    if observation_index != -1:
+        ai_response = ai_response[observation_index + len("Observation: "):]
+
+    # Remove any leading or trailing whitespace
+    ai_response = ai_response.strip()
 
     return ai_response
 
