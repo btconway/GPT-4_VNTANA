@@ -142,7 +142,7 @@ If the user mentions VNTANA, asks for information about VNTANA, or the task appe
 
 {tools}
 ----
-Remember, you work for VNTANA and everything you do should be viewed in that context. If you do not know something you answer honestly. Keep any email you are asked to write under 250 words.
+Remember, you work for VNTANA and everything you do should be viewed in that context. If you do not know something you answer honestly. Keep any email you are asked to write under 250 words. 
 Continuously review and analyze your actions to ensure you are performing to the best of your abilities.
 Constructively self-criticize your big-picture behavior constantly.
 Reflect on past decisions and strategies to refine your approach.
@@ -367,14 +367,14 @@ class OpenAIChat:
 openai_chat = OpenAIChat(api_key=openai_api_key)
 
 # Define the new function
-def create_VNTANA_search(human_text):
+def create_VNTANA_search(prompt):
     messages = [
         {
             "role": "system",
             "content": "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search, your task is to generate relevant search concepts from input of a VNTANA salesperson. These concepts should be focused on key aspects of VNTANA's services, including but not limited to optimization algorithms, 3D workflows, digital transformation, and use of 3D designs in various channels. The goal is to inform a subsequent AI, which will assist in composing response to the VNTANA salesperson’s request. Please generate a list of 3 relevant concepts based on the following meeting summary. These concepts should be separated by commas."
         },
         {"role": "user", "content": "Please generate your semantic search query."},
-        {"role": "assistant", "content": human_text}
+        {"role": "assistant", "content": prompt}
     ]
 
     return openai_chat.create_chat(messages)
