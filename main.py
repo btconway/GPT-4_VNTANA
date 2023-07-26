@@ -131,11 +131,11 @@ Whenever you use a tool, you must wait until your receive the results of the too
 
 ```
 Thought: Do I need to use a tool? No
-"{ai_prefix}": [your response here]
+"AI": [your response here]
 ```"""
 
 SUFFIX = """Begin!
-
+REMEMBER, you must ALWAYS follow your {format_instructions} when responding to the Human.
 Previous conversation history:
 {chat_history}
 
