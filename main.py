@@ -131,7 +131,7 @@ Whenever you use a tool, you must wait until your receive the results of the too
 
 ```
 Thought: Do I need to use a tool? No
-"VNTANA AI": [your response here]
+"{ai_prefix}": [your response here]
 ```"""
 
 SUFFIX = """Begin!
@@ -170,7 +170,7 @@ class CustomOutputParser(AgentOutputParser):
         if "AI:" in llm_output:
             logging.info("Detected prefix 'AI:' in LLM output")
             return AgentFinish(
-                return_values={"output": llm_output.split("VNTANA AI:")[-1].strip()},
+                return_values={"output": llm_output.split("AI:")[-1].strip()},
                 log=llm_output,
             )
 
@@ -232,7 +232,6 @@ class CustomChatAgent(Agent):
         formats: str = FORMAT_INSTRUCTIONS,
         input_variables: Optional[List[str]] = None,
         output_parser: Optional[BaseOutputParser] = None,
-        ai_prefix: str = "VNTANA AI",
     ) -> BasePromptTemplate:
         tool_strings = "\n".join(
             [f"> {tool.name}: {tool.description}" for tool in tools]
@@ -445,11 +444,11 @@ def parse_ai_response(response_dict):
         return response_dict["Non-JSON Response"]
     
     # Extract the AI's response from the response dictionary
-    ai_response = response_dict.get("VNTANA AI", "")
+    ai_response = response_dict.get("AI", "")
     
     # If the AI's response is not found, extract the text between "VNTANA AI": " and "
     if not ai_response:
-        match = re.search(r'"VNTANA AI": "(.*?)"', response)
+        match = re.search(r'"AI": "(.*?)"', response)
         if match:
             ai_response = match.group(1)
 
@@ -475,7 +474,7 @@ def is_json(myjson):
 if prompt := st.chat_input():
     st.chat_message("user").write(prompt)
     st.session_state.chat_history.append({"role": "user", "content": prompt})  # Add user message to chat history
-    with st.chat_message("VNTANA AI"):
+    with st.chat_message("AI"):
         st_callback = StreamlitCallbackHandler(st.container())
         # Convert the chat history into a format that chain.run() can handle
         chat_history_str = "\n".join([f"{msg['role']}: {msg['content']}" for msg in st.session_state.chat_history])
