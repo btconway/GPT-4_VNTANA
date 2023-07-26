@@ -6,7 +6,7 @@ __pycache__/
 # C extensions
 *.so
 
-*custom_agent_optmized.py
+custom_agent_optmized.py
 /documents
 
 # Distribution / packaging
