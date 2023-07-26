@@ -11,7 +11,6 @@ import logging
 import os
 import re
 import sys
-import asyncio
 import weaviate
 import openai
 from pydantic import BaseModel, Field
@@ -34,11 +33,9 @@ from langchain.callbacks.base import BaseCallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
-from langchain.embeddings import OpenAIEmbeddings
-import langchain
 #from langchain.cache import RedisSemanticCache
 from langchain.llms import OpenAI
-from langchain.memory import ConversationBufferMemory
+from langchain.memory import ConversationTokenBufferMemory
 from langchain.prompts.base import BasePromptTemplate
 from langchain.prompts.chat import (
     ChatPromptTemplate,
@@ -131,7 +128,7 @@ Whenever you use a tool, you must wait until your receive the results of the too
 
 ```
 Thought: Do I need to use a tool? No
-"AI": [your response here]
+"AI:" [your response here]
 ```"""
 
 SUFFIX = """Begin!
@@ -412,7 +409,9 @@ additional_tools = [
 
 tools.extend(additional_tools) # Add the additional tools to the original list
 
-memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+llm = OpenAI(temperature=0.0, model="gpt-3.5-turbo-16k", streaming=False)
+
+memory = ConversationTokenBufferMemory(memory_key="chat_history", return_messages=True, max_tokens=4200, llm=llm)
 
 # Create the agent and run it
 st_container = st.container()
