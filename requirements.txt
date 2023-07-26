@@ -3,4 +3,3 @@ weaviate-client
 pydantic
 openai
 tiktoken
-redis
