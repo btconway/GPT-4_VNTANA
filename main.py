@@ -362,6 +362,12 @@ class VNTANAsalesmarketingQueryTool(BaseTool):
     description = "useful whenever writing copy for sales and marketing or looking for information about VNTANA"
     args_schema: Type[VNTANAsalesmarketingQuerySchema] = VNTANAsalesmarketingQuerySchema
 
+    def truncate_response(self, response: str, max_length: int = 6000) -> str:
+        """Truncate the response if it exceeds the max_length."""
+        if len(response) > max_length:
+            return response[:max_length]
+        return response
+
     def _run(
         self, 
         query: str, 
@@ -375,6 +381,7 @@ class VNTANAsalesmarketingQueryTool(BaseTool):
                 for concept in concepts:
                     nearText = {"concepts": [concept.strip()]}  # Search for each concept individually
                     resp = client.query.get(class_name, ["text"]).with_near_text(nearText).with_limit(1).do()
+                    resp = self.truncate_response(resp)  # Truncate the response if it exceeds 6000 characters
                     results.append(resp)
                     resp_single_line = json.dumps(resp).replace('\n', ' ')
                     logging.info(f"Resp: {resp_single_line}")
@@ -384,6 +391,7 @@ class VNTANAsalesmarketingQueryTool(BaseTool):
             raise e
 
         return results  # Added return statement
+
     async def _arun(
         self, 
         query: str, 
@@ -391,12 +399,11 @@ class VNTANAsalesmarketingQueryTool(BaseTool):
     ) -> dict:
         return self._run(query, run_manager)
 
-
 def query_weaviate(input):
     try:
         openai.api_key = openai_api_key
         response = openai.ChatCompletion.create(
-          model="gpt-3.5-turbo-16k",
+          model="gpt-4",
           messages=[
                 {"role": "system", "content": "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate relevant search concepts from input of a VNTANA salesperson. These concepts should be focused on key aspects of VNTANA's services, including but not limited to optimization algorithms, 3D workflows, digital transformation, and use of 3D designs in various channels. The goal is to inform a subsequent AI, which will assist in composing response to the VNTANA salesperson’s request. Please generate a list of up to 3 relevant concepts based on the following user input. These concepts should be separated by commas."},
                 {"role": "user", "content": "Please generate your semantic search query."},
@@ -442,7 +449,7 @@ memory = ConversationBufferMemory(memory_key="chat_history", return_messages=Tru
 # Create the agent and run it
 st_container = st.container()
 llm = ChatOpenAI(
-    temperature=0.3, 
+    temperature=0.4, 
     callbacks=[StreamlitCallbackHandler(parent_container=st_container, expand_new_thoughts=False, collapse_completed_thoughts=True)], 
     streaming=True,
     model="gpt-4",
@@ -456,11 +463,6 @@ chain = AgentExecutor.from_agent_and_tools(
 # Initialize the chat history in session state if it doesn't exist
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
-
-#langchain.llm_cache = RedisSemanticCache(
-    #embedding=OpenAIEmbeddings(openai_api_key=openai_api_key),
-    #redis_url="redis://default:F2O32zJosNfH4twcMy3pG2Ot24oeo1G3@redis-13193.c253.us-central1-1.gce.cloud.redislabs.com:13193/0"
-#)
 
 # Streamlit interaction
 st.title("VNTANA Sales Assistant")
