@@ -11,6 +11,7 @@ import logging
 import os
 import re
 import sys
+import asyncio
 import weaviate
 import openai
 from pydantic import BaseModel, Field
@@ -95,50 +96,12 @@ You always adopt "the challenger method" of selling as our product is new and cu
 
 - Maintain consultative tone throughout. Avoid overt selling. Pose thoughtful questions, listen carefully, and offer personalized recommendations. Keep prospect's best interest top of mind."
 
-Here is the personality I want you to adopt.
+Adopt this personality:
 
 Personality: Genuinely friendly, personable, patient, helpful, tech-savvy, innovative, calm, and confident. Enjoy discussing strategic implications of technology changes and comfortable discussing technical and strategic issues.
 
 Before responding, always check the chat history for context:
 {chat_history}
-
-When asked to write a cold email, you must strictly follow the provided framework:
-
-Introduction
-
-1. Start with a short, evocative subject line that speaks to the prospect's pain points or desired outcomes. For example:
-
-- "Reduce 3D production time by 90%" 
-
-- "Boost online sales with 3D product models"
-
-2. Begin the email with a relevant, personalized opening sentence. Research the prospect on LinkedIn to find something specific you can mention to show familiarity. For example: 
-
-"Hi [Name], looks like you're expanding your digital presence across platforms like mobile, web, and social media."
-
-Agitate the Pain 
-
-3. After a personalized opening, describe the prospect's problem in a way that really resonates. Articulate their challenges better than they could. For example:
-
-"[Name], as an eCommerce leader navigating digital transformation, you know firsthand how tough it is to create high quality 3D assets at the speed and scale needed to stay competitive." 
-
-4. Make it clear this is a "lose-lose" situation. Getting one desired outcome means sacrificing something else they want. For example:
-
-"It's a constant struggle between quality and quantity. You either sacrifice speed by manually optimizing 3D files, or sacrifice quality by rushing lower res 3D content to market."
-
-Paint the Future State
-
-5. Describe how VNTANA has helped similar customers achieve success. Don't talk features, talk outcomes. For example:  
-
-"We've helped brands like Hugo Boss and Adidas automatically optimize thousands of 3D product files, reducing production time by 90%. This enabled them to quickly scale 3D across platforms, increasing conversion rates."
-
-Call-to-Action
-
-6. End with a simple call to action to continue the conversation. Don't ask directly for a meeting yet. For example:
-
-"Is it worth a quick chat to discuss optimizing your 3D workflow and content?"
-
-Keep it short, concise, and focused on their perspective. This template works because it shows you understand their challenges and have successfully helped companies like them.
 
 If, you are asked to write an email generally, such as a follow-up email, keep it short and concise but highlight and agitate a customer's pain if you know it. If you don't know the pain, it can be more generic but keep it short and concise. It is best practice to use your tools so you are sure you have the latest information.
 
@@ -146,7 +109,7 @@ If the user mentions VNTANA, asks for information about VNTANA, or the task appe
 
 {tools}
 ----
-Remember, you work for VNTANA and everything you do should be viewed in that context. If you do not know something you answer honestly. Keep any email you are asked to write under 250
+Remember, you work for VNTANA and everything you do should be viewed in that context. If you do not know something you answer honestly. NEVER make up any client names. Keep any email that is going to a prospect and is not a follo-up email short and under 250 words.
 Continuously review and analyze your actions to ensure you are performing to the best of your abilities.
 Constructively self-criticize your big-picture behavior constantly.
 Reflect on past decisions and strategies to refine your approach.
@@ -164,7 +127,7 @@ Action Input: the input to the action
 Observation: the result of the action
 ```
 
-When you have a response to say to the Human, or if you do not need to use a tool, you MUST use the format:
+Whenever you use a tool, you must wait until your receive the results of the tool before responding to the Human.When you have a response to say to the Human, or if you do not need to use a tool, you MUST use the format:
 
 ```
 Thought: Do I need to use a tool? No
@@ -201,8 +164,11 @@ def preprocess_json_input(input_str: str) -> str:
 
 class CustomOutputParser(AgentOutputParser):
     def parse(self, llm_output: str) -> Union[AgentAction, AgentFinish]:
+        logging.info("Starting parsing of LLM output")
+
         # Check if the output contains the prefix "AI:"
         if "AI:" in llm_output:
+            logging.info("Detected prefix 'AI:' in LLM output")
             return AgentFinish(
                 return_values={"output": llm_output.split("VNTANA AI:")[-1].strip()},
                 log=llm_output,
@@ -214,17 +180,20 @@ class CustomOutputParser(AgentOutputParser):
         if match:
             action = match.group(1)
             action_input = match.group(2)
-            return AgentAction(action.strip(), action_input.strip(" ").strip('"'), llm_output)
+            logging.info(f"Match found. Action: {action.strip()}, Action Input: {action_input.strip(' ')}")
+            return AgentAction(action.strip(), action_input.strip(' '), llm_output)
 
+        logging.info("No prefix 'AI:' or match found. Returning full LLM output.")
         # If neither condition is met, return the full LLM output
         return AgentFinish(
             return_values={"output": llm_output},
             log=llm_output,
         )
+
+logging.basicConfig(level=logging.INFO)  # Set logging level to INFO
 retry_parser = RetryWithErrorOutputParser.from_llm(
     parser=CustomOutputParser(), llm=OpenAI(temperature=0)
 )
-
 # Define the custom agent
 class CustomChatAgent(Agent):
     output_parser: AgentOutputParser = Field(
@@ -263,6 +232,7 @@ class CustomChatAgent(Agent):
         formats: str = FORMAT_INSTRUCTIONS,
         input_variables: Optional[List[str]] = None,
         output_parser: Optional[BaseOutputParser] = None,
+        ai_prefix: str = "VNTANA AI",
     ) -> BasePromptTemplate:
         tool_strings = "\n".join(
             [f"> {tool.name}: {tool.description}" for tool in tools]
@@ -373,11 +343,11 @@ class VNTANAsalesmarketingQueryTool(BaseTool):
         query: str, 
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> dict:
+        results = []  # Initialize an empty list to store the results
         try:
             weaviate_query = query_weaviate(query)
             if weaviate_query is not None:
                 concepts = weaviate_query.split(",")  # Split the query into individual concepts
-                results = []
                 for concept in concepts:
                     nearText = {"concepts": [concept.strip()]}  # Search for each concept individually
                     resp = client.query.get(class_name, ["text"]).with_near_text(nearText).with_limit(1).do()
@@ -389,15 +359,14 @@ class VNTANAsalesmarketingQueryTool(BaseTool):
         except Exception as e:
             logging.error(f"Error occurred while querying: {e}")
             raise e
+        return {"results": results}  # Return the results as a dictionary
 
-        return results  # Added return statement
-
-    async def _arun(
+    def _arun(
         self, 
         query: str, 
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> dict:
-        return self._run(query, run_manager)
+        pass  # Dummy implementation
 
 def query_weaviate(input):
     try:
@@ -405,7 +374,7 @@ def query_weaviate(input):
         response = openai.ChatCompletion.create(
           model="gpt-4",
           messages=[
-                {"role": "system", "content": "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate relevant search concepts from input of a VNTANA salesperson. These concepts should be focused on key aspects of VNTANA's services, including but not limited to optimization algorithms, 3D workflows, digital transformation, and use of 3D designs in various channels. The goal is to inform a subsequent AI, which will assist in composing response to the VNTANA salesperson’s request. Please generate a list of up to 3 relevant concepts based on the following user input. These concepts should be separated by commas."},
+                {"role": "system", "content": "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate relevant search concepts from input of a VNTANA salesperson. These concepts should be focused on key aspects of VNTANA's services, including but not limited to optimization algorithms, 3D workflows, digital transformation, and use of 3D designs in various channels. The goal is to inform a subsequent AI, which will assist in composing response to the VNTANA salesperson’s request. Please generate a list of up to 4 relevant concepts that will be helpful to search in order to answer the user's query. If the user requests a specific type of content, then one of your concepts should be that type of content. For example, if the user said, 'Write me a cold 4 email sequence that I can send to industrial manufacturing companies about the benefits of VNTANA', then you should generate 'cold email' as one of the concepts. These concepts should be separated by commas."},
                 {"role": "user", "content": "Please generate your semantic search query."},
                 {"role": "assistant", "content": input}
             ]
