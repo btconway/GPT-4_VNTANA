@@ -7,7 +7,7 @@ __pycache__/
 *.so
 
 *custom_agent_optmized.py
-*/documents/*
+*/documents/
 
 # Distribution / packaging
 .Python
