@@ -5,7 +5,7 @@ from langchain.callbacks.streamlit import StreamlitCallbackHandler  # Import Str
 
 st.set_page_config(page_title="VNTANA Sales", page_icon=":robot:")
 
-from typing import Any, List, Optional, Sequence, Tuple, Union
+from typing import Any, List, Optional, Sequence, Tuple, Union, Type
 import json
 import logging
 import os
@@ -20,6 +20,9 @@ from langchain.agents import (
     load_tools
 )
 from langchain.output_parsers import RetryWithErrorOutputParser
+from langchain.callbacks.manager import CallbackManagerForToolRun
+from langchain.utilities import SerpAPIWrapper
+from langchain.agents import Tool
 from langchain.agents.agent import Agent
 from langchain.agents.utils import validate_tools_single_input
 from langchain.callbacks.base import BaseCallbackHandler
@@ -32,7 +35,7 @@ from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings import OpenAIEmbeddings
 import langchain
-from langchain.cache import RedisSemanticCache
+#from langchain.cache import RedisSemanticCache
 from langchain.llms import OpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts.base import BasePromptTemplate
@@ -49,10 +52,9 @@ from langchain.schema import (
     HumanMessage, 
     SystemMessage
 )
-from langchain.tools import StructuredTool
 from langchain.tools.base import BaseTool
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)  # Changed to DEBUG level to capture more details
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)  # Changed to DEBUG level to capture more details
 logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
 LANGCHAIN_TRACING = tracing_enabled(True)
@@ -61,6 +63,8 @@ LANGCHAIN_TRACING = tracing_enabled(True)
 username = os.getenv('WEAVIATE_USERNAME')
 password = os.getenv('WEAVIATE_PASSWORD')
 openai_api_key = os.getenv('OPENAI_API_KEY')
+serpapi_api_key = os.environ.get('SERPAPI_API_KEY')
+
 
 # creating a Weaviate client
 resource_owner_config = weaviate.AuthClientPassword(
@@ -142,7 +146,7 @@ If the user mentions VNTANA, asks for information about VNTANA, or the task appe
 
 {tools}
 ----
-Remember, you work for VNTANA and everything you do should be viewed in that context. If you do not know something you answer honestly. Keep any email you are asked to write under 250 words. 
+Remember, you work for VNTANA and everything you do should be viewed in that context. If you do not know something you answer honestly. Keep any email you are asked to write under 250
 Continuously review and analyze your actions to ensure you are performing to the best of your abilities.
 Constructively self-criticize your big-picture behavior constantly.
 Reflect on past decisions and strategies to refine your approach.
@@ -200,7 +204,7 @@ class CustomOutputParser(AgentOutputParser):
         # Check if the output contains the prefix "AI:"
         if "AI:" in llm_output:
             return AgentFinish(
-                return_values={"output": llm_output.split("AI:")[-1].strip()},
+                return_values={"output": llm_output.split("VNTANA AI:")[-1].strip()},
                 log=llm_output,
             )
 
@@ -217,6 +221,9 @@ class CustomOutputParser(AgentOutputParser):
             return_values={"output": llm_output},
             log=llm_output,
         )
+retry_parser = RetryWithErrorOutputParser.from_llm(
+    parser=CustomOutputParser(), llm=OpenAI(temperature=0)
+)
 
 # Define the custom agent
 class CustomChatAgent(Agent):
@@ -347,67 +354,66 @@ class StreamHandler(BaseCallbackHandler):
 
 class_name = "VNTANAsalesAgent"
 
-# OpenAI Chat class
-class OpenAIChat:
-    def __init__(self, api_key: str):
-        self.api_key = api_key
-        openai.api_key = self.api_key
+class VNTANAsalesmarketingQuerySchema(BaseModel):
+    query: str = Field(description="should be a search query")
 
-    def create_chat(self, messages: List[dict]) -> dict:
+class VNTANAsalesmarketingQueryTool(BaseTool):
+    name = "VNTANA Search Tool"
+    description = "useful whenever writing copy for sales and marketing or looking for information about VNTANA"
+    args_schema: Type[VNTANAsalesmarketingQuerySchema] = VNTANAsalesmarketingQuerySchema
+
+    def _run(
+        self, 
+        query: str, 
+        run_manager: Optional[CallbackManagerForToolRun] = None,
+    ) -> dict:
         try:
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=messages,
-            )
-            return response
+            weaviate_query = query_weaviate(query)
+            if weaviate_query is not None:
+                concepts = weaviate_query.split(",")  # Split the query into individual concepts
+                results = []
+                for concept in concepts:
+                    nearText = {"concepts": [concept.strip()]}  # Search for each concept individually
+                    resp = client.query.get(class_name, ["text"]).with_near_text(nearText).with_limit(1).do()
+                    results.append(resp)
+                    resp_single_line = json.dumps(resp).replace('\n', ' ')
+                    logging.info(f"Resp: {resp_single_line}")
+                    logging.info(resp)  # Changed from print to logging.info
         except Exception as e:
-            logging.error("Error in create_VNTANA_search: %s", e)
-            return {}
+            logging.error(f"Error occurred while querying: {e}")
+            raise e
 
-openai_chat = OpenAIChat(api_key=openai_api_key)
+        return results  # Added return statement
+    async def _arun(
+        self, 
+        query: str, 
+        run_manager: Optional[CallbackManagerForToolRun] = None,
+    ) -> dict:
+        return self._run(query, run_manager)
 
-# Define the new function
-def create_VNTANA_search(prompt):
-    messages = [
-        {
-            "role": "system",
-            "content": "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search, your task is to generate relevant search concepts from input of a VNTANA salesperson. These concepts should be focused on key aspects of VNTANA's services, including but not limited to optimization algorithms, 3D workflows, digital transformation, and use of 3D designs in various channels. The goal is to inform a subsequent AI, which will assist in composing response to the VNTANA salesperson’s request. Please generate a list of 3 relevant concepts based on the following meeting summary. These concepts should be separated by commas."
-        },
-        {"role": "user", "content": "Please generate your semantic search query."},
-        {"role": "assistant", "content": prompt}
-    ]
 
-    return openai_chat.create_chat(messages)
+def query_weaviate(input):
+    try:
+        openai.api_key = openai_api_key
+        response = openai.ChatCompletion.create(
+          model="gpt-3.5-turbo-16k",
+          messages=[
+                {"role": "system", "content": "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate relevant search concepts from input of a VNTANA salesperson. These concepts should be focused on key aspects of VNTANA's services, including but not limited to optimization algorithms, 3D workflows, digital transformation, and use of 3D designs in various channels. The goal is to inform a subsequent AI, which will assist in composing response to the VNTANA salesperson’s request. Please generate a list of up to 3 relevant concepts based on the following user input. These concepts should be separated by commas."},
+                {"role": "user", "content": "Please generate your semantic search query."},
+                {"role": "assistant", "content": input}
+            ]
+        )
+        weaviate_query = response['choices'][0]['message']['content']
+        weaviate_query_single_line = weaviate_query.replace('\n', ' ')  # Replace newline characters with spaces
+        logging.info("Search query generated successfully.")  # Changed from print to logging.info
+        logging.info(f"Query: {weaviate_query_single_line}")  # Changed from print to logging.info
+        return weaviate_query
+    except Exception as e:
+        logging.error(f"Error generating query with OpenAI: {e}")  # Changed from print to logging.error
+        return None
 
-def VNTANA_search_tool(input: str):
-    response = create_VNTANA_search(input)
-    if not response:
-        return []
-
-    response_text_value = response['choices'][0]['message']['content']
-    generate_prompt = "summarize the text while maintaining details that would be most helpful to an AI generating content for sales and marketing for VNTANA. VNTANA is a 3D infrastructure platform focused on managing, optimizing, and distributing 3D assets at scale. Only summarize the text if it exceeds 1000 characters, otherwise, just rewrite the text word for word. Here is the text to summarize: {content}"
-
-    concepts = [concept.strip() for concept in response_text_value.split(",")]
-    nearText = {"concepts": concepts}
-
-    resp = client.query.get("VNTANAsales", ["content"]).with_generate(single_prompt=generate_prompt).with_near_text(nearText).with_limit(2).do()
-
-    return [item['_additional']['generate']['singleResult'] for item in resp['data']['Get']['VNTANAsales'] if item['_additional']['generate']['error'] is None]
-
-class VNTANASearchInput(BaseModel):
-    input: str = Field()
-
-VNTANA_search_tool = StructuredTool.from_function(
-    func=VNTANA_search_tool,
-    name="VNTANA writing helper",
-    description="useful when you need to write any information about VNTANA or sales and marketing copy",
-    args_schema=VNTANASearchInput
-)
-
-retry_parser = RetryWithErrorOutputParser.from_llm(
-    parser=CustomOutputParser(), llm=OpenAI(temperature=0)
-)
-
+search = SerpAPIWrapper()
+vntana = VNTANAsalesmarketingQueryTool()
 
 # Load tools and memory
 math_llm = OpenAI(temperature=0.0, model="gpt-4", streaming=True)
@@ -415,16 +421,31 @@ tools = load_tools(
     ["human", "llm-math"],
     llm=math_llm,
 )
-memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
-tools.append(VNTANA_search_tool)
+additional_tools = [
+    Tool(
+        name = "Current Search",
+        func=search.run,
+        description="useful for when you need to answer questions about current events or the current state of the world"
+    ),
+    Tool(
+        name = "VNTANA Sales & Marketing Helper",
+        func=vntana.run,  # Use run here instead of arun
+        description="useful when you need to write any information about VNTANA or sales and marketing copy"
+    )
+]
+
+tools.extend(additional_tools) # Add the additional tools to the original list
+
+memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
 # Create the agent and run it
 st_container = st.container()
 llm = ChatOpenAI(
     temperature=0.3, 
     callbacks=[StreamlitCallbackHandler(parent_container=st_container, expand_new_thoughts=False, collapse_completed_thoughts=True)], 
-    streaming=True
+    streaming=True,
+    model="gpt-4",
 )
 
 # Create the agent
@@ -436,10 +457,10 @@ chain = AgentExecutor.from_agent_and_tools(
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
-langchain.llm_cache = RedisSemanticCache(
-    embedding=OpenAIEmbeddings(openai_api_key=openai_api_key),
-    redis_url="redis://default:F2O32zJosNfH4twcMy3pG2Ot24oeo1G3@redis-13193.c253.us-central1-1.gce.cloud.redislabs.com:13193/0"
-)
+#langchain.llm_cache = RedisSemanticCache(
+    #embedding=OpenAIEmbeddings(openai_api_key=openai_api_key),
+    #redis_url="redis://default:F2O32zJosNfH4twcMy3pG2Ot24oeo1G3@redis-13193.c253.us-central1-1.gce.cloud.redislabs.com:13193/0"
+#)
 
 # Streamlit interaction
 st.title("VNTANA Sales Assistant")
