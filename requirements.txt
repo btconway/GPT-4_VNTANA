@@ -3,3 +3,4 @@ weaviate-client
 pydantic
 openai
 tiktoken
+google-search-results
