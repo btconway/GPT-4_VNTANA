@@ -135,7 +135,7 @@ Thought: Do I need to use a tool? No
 ```"""
 
 SUFFIX = """Begin!
-REMEMBER, you must ALWAYS follow your {format_instructions} when responding to the Human.
+REMEMBER, you must ALWAYS follow your FORMAT INSTRUCTIONS when responding to the Human.
 Previous conversation history:
 {chat_history}
 
