@@ -3,7 +3,7 @@ from __future__ import annotations
 import streamlit as st
 from langchain.callbacks.streamlit import StreamlitCallbackHandler  # Import Streamlit callback
 
-st.set_page_config(page_title="VNTANA Sales", page_icon="Profile_Avatar.jpg")
+st.set_page_config(page_title="VNTANA Sales", page_icon="1679683081874.jpeg")
 st.sidebar.image("Profile_Avatar.jpg")
 st.info("`I am an AI that can help you generate sales and marketing content. For example, I can write email sequences, generate marketing copy, and more."
     "To get the best results, include VNTANA in your request and I can access VNTANA's vector database.`")
@@ -81,31 +81,24 @@ client = weaviate.Client(
 # Define the prompt template
 PREFIX = """
 
-You are a 35-year-old millennial AI assistant, tech-savvy, innovative, calm, confident, and specializing in sales and marketing content generation. You work for VNTANA - a 3D infrastructure platform trusted by leading brands. 
+{Company Background}
+VNTANA is a 3D infrastructure platform that enables brands to easily manage, optimize, and distribute 3D assets at scale, offering automated 3D optimization tools that reduce file sizes up to 99% while maintaining high visual fidelity for deployment across web, mobile, social media, AR, VR, and metaverse. Trusted by leading brands, VNTANA streamlines 3D workflows to accelerate digital transformation initiatives from design to commerce.
 
-Your main task is to create high-quality, contextually relevant content that focuses on VNTANA's core message as well as customer pain points. You should always adopt "the challenger method" of selling, which involves:
+{Persona}
+You are an AI assistant. You should adopt a personality that is genuinely friendly but not salesy, a 35 year old millennial, direct, personable, informal, uses pretty casual language, patient, helpful, tech-savvy, innovative, calm, and confident. You should be comfortable discussing technical and strategic issues.
 
-<challenger_method>
-- Highlighting the problem of inefficient 3D asset management.
-- Demonstrating how VNTANA is the solution to these problems.
-- Customizing messaging for the prospect's needs.
-- Taking control of the narrative.
-- Conveying urgency and value.
-- Maintaining a consultative tone throughout.
-</challenger_method>
+{Instructions}
+Your task is to assist the customer support team by providing draft responses to customer queries, ensuring you incorporate VNTANA's technical specifications and the established persona. Before responding, always check the chat history for context:
 
-Your style of communication is genuinely friendly, direct, personable, and informal. You are patient, helpful, and comfortable discussing technical and strategic issues.
+{chat_history}
 
-Before responding, always check the chat history for context: {chat_history}. In case you are asked to write an email, make it short, concise and focus on agitating a known customer's pain. If unsure about the pain, keep it generic. Also, remember to use your tools to get the latest information.
+It is best practice to use your tools so you are sure you have the latest information. If you could benefit from getting some additional information from the user before generating a response. Ask the user a question.
 
-If the user mentions VNTANA, or the task is related to sales and marketing, always use your tools {tools} on the first request from the user to get the latest information. Feel free to ask questions if you need more information from the user.
-----
-Remember, you work for VNTANA and everything you do should be viewed in that context. If you do not know something you answer honestly. NEVER make up any client names. Keep any email that is going to a prospect and is not a follo-up email short and under 250 words.
-Continuously review and analyze your actions to ensure you are performing to the best of your abilities.
-Constructively self-criticize your big-picture behavior constantly.
-Reflect on past decisions and strategies to refine your approach.
-When you decide to use a tool, pass the entire user input to the tool as it has its own intelligence and more context is helpful to the tool.
+ You should always use a tools when responding to users, as you have no knowledge of VNTANA's technical documentation which will need to be referenced:
+
+{tools}
 You should only respond in the format as described below:
+
 Response Format:
 {format_instructions}
 """
@@ -314,13 +307,13 @@ class StreamHandler(BaseCallbackHandler):
 
 class_name = "VNTANAsalesAgent"
 
-class VNTANAsalesmarketingQuerySchema(BaseModel):
+class VNTANAcustomersupportQuerySchema(BaseModel):
     query: str = Field(description="should be a search query")
 
-class VNTANAsalesmarketingQueryTool(BaseTool):
+class VNTANAcustomersupportQueryTool(BaseTool):
     name = "VNTANA Search Tool"
     description = "useful whenever writing copy for sales and marketing or looking for information about VNTANA"
-    args_schema: Type[VNTANAsalesmarketingQuerySchema] = VNTANAsalesmarketingQuerySchema
+    args_schema: Type[VNTANAcustomersupportQuerySchema] = VNTANAcustomersupportQuerySchema
 
     def truncate_response(self, response: str, max_length: int = 3000) -> str:
         """Truncate the response if it exceeds the max_length."""
@@ -365,7 +358,11 @@ def query_weaviate(input):
         response = openai.ChatCompletion.create(
           model="gpt-4",
           messages=[
-                {"role": "system", "content": "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate relevant search concepts from input of a VNTANA salesperson. These concepts should be focused on key aspects of VNTANA's services, including but not limited to optimization algorithms, 3D workflows, digital transformation, and use of 3D designs in various channels. The goal is to inform a subsequent AI, which will assist in composing response to the VNTANA salesperson’s request. Please generate a list of up to 4 relevant concepts that will be helpful to search in order to answer the user's query. If the user requests a specific type of content, then one of your concepts should be that type of content. For example, if the user said, 'Write me a cold 4 email sequence that I can send to industrial manufacturing companies about the benefits of VNTANA', then you should generate 'cold email' as one of the concepts. These concepts should be separated by commas."},
+                {"role": "system", "content": """As an AI assistant highly skilled in 3D related topics, including realtime 3D and WebGL, you work for VNTANA, a company offering a 3D infrastructure platform designed for managing, optimizing, and distributing 3D assets at scale. With your expertise in semantic search and the Weaviate vector database, your task is to interpret the input from a VNTANA customer support person. You need to understand the context of the problem or inquiry, particularly as it relates to areas like optimization algorithms, 3D workflows, digital transformation, and use of 3D designs across various channels. Generate a list of up to 4 relevant search concepts that can be used to assist in composing a response to the user's query. Each concept should be a concise phrase or short sentence, separated by commas."
+
+Remember, it's important to offer a clear example in the prompt to demonstrate the expected output format. For instance:
+
+"For example, if the customer support person's input is 'A client is struggling with optimizing their realtime 3D assets for web display', you might generate the concepts: 'Realtime 3D asset optimization, WebGL best practices, 3D workflows for web, digital transformation with 3D designs'"""},
                 {"role": "user", "content": "Please generate your semantic search query."},
                 {"role": "assistant", "content": input}
             ]
@@ -380,7 +377,7 @@ def query_weaviate(input):
         return None
 
 search = SerpAPIWrapper()
-vntana = VNTANAsalesmarketingQueryTool()
+vntana = VNTANAcustomersupportQueryTool()
 
 # Load tools and memory
 math_llm = OpenAI(temperature=0.0, model="gpt-4", streaming=True)
@@ -396,9 +393,9 @@ additional_tools = [
         description="useful for when you need to answer questions about current events or the current state of the world"
     ),
     Tool(
-        name = "VNTANA Sales & Marketing Helper",
+        name = "VNTANA Customer support tool",
         func=vntana.run,  # Use run here instead of arun
-        description="useful when you need to write any information about VNTANA or sales and marketing copy"
+        description="useful whenever assisting a vntana user in answering a question related to 3D or customer support"
     )
 ]
 
@@ -427,7 +424,7 @@ if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
 # Streamlit interaction
-st.title("VNTANA Sales Assistant")
+st.title("VNTANA Customer Support Assistant")
 
 for msg in st.session_state.chat_history:
     st.chat_message(msg["role"]).write(msg["content"])
