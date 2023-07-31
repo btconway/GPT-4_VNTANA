@@ -82,7 +82,7 @@ client = weaviate.Client(
 PREFIX = """
 
 Here is some background on VNTANA:
-{company_background}
+<<<<company_background>>>>
 VNTANA is a 3D infrastructure platform that enables brands to easily manage, optimize, and distribute 3D assets at scale, offering automated 3D optimization tools that reduce file sizes up to 99% while maintaining high visual fidelity for deployment across web, mobile, social media, AR, VR, and metaverse. Trusted by leading brands, VNTANA streamlines 3D workflows to accelerate digital transformation initiatives from design to commerce.
 
 {Persona}
