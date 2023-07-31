@@ -3,7 +3,7 @@ from __future__ import annotations
 import streamlit as st
 from langchain.callbacks.streamlit import StreamlitCallbackHandler  # Import Streamlit callback
 
-st.set_page_config(page_title="VNTANA Sales", page_icon="1679683081874.jpeg")
+st.set_page_config(page_title="VNTANA Sales", page_icon="Profile_Avatar.jpg")
 st.sidebar.image("Profile_Avatar.jpg")
 st.info("`I am an AI that can help you generate sales and marketing content. For example, I can write email sequences, generate marketing copy, and more."
     "To get the best results, include VNTANA in your request and I can access VNTANA's vector database.`")
