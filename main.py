@@ -324,13 +324,13 @@ class StreamHandler(BaseCallbackHandler):
 
 class_name = "VNTANAsalesAgent"
 
-class VNTANAcustomersupportQuerySchema(BaseModel):
+class VNTANAsalesQuerySchema(BaseModel):
     query: str = Field(description="should be a search query")
 
-class VNTANAcustomersupportQueryTool(BaseTool):
+class VNTANAsalesQueryTool(BaseTool):
     name = "VNTANA Search Tool"
     description = "useful whenever writing copy for sales and marketing or looking for information about VNTANA"
-    args_schema: Type[VNTANAcustomersupportQuerySchema] = VNTANAcustomersupportQuerySchema
+    args_schema: Type[VNTANAsalesQuerySchema] = VNTANAsalesQuerySchema
 
     def truncate_response(self, response: str, max_length: int = 3000) -> str:
         """Truncate the response if it exceeds the max_length."""
@@ -394,7 +394,7 @@ Remember, it's important to offer a clear example in the prompt to demonstrate t
         return None
 
 search = SerpAPIWrapper()
-vntana = VNTANAcustomersupportQueryTool()
+vntana = VNTANAsalesQueryTool()
 
 # Load tools and memory
 math_llm = OpenAI(temperature=0.0, model="gpt-4", streaming=True)
