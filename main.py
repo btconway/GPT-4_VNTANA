@@ -322,7 +322,7 @@ class StreamHandler(BaseCallbackHandler):
         else:
             raise ValueError(f"Invalid display_method: {self.display_method}")
 
-class_name = "VNTANAsalesAgent"
+class_name = "VNTANAsalesAgent2"
 
 class VNTANAsalesQuerySchema(BaseModel):
     query: str = Field(description="should be a search query")
