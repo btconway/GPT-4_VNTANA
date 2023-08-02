@@ -103,7 +103,7 @@ Personality: Genuinely friendly but not salesy, direct, personable, informal, us
 Before responding, always check the chat history for context:
 {chat_history}
 
-If, you are asked to write an email generally, such as a follow-up email, keep it short and concise but highlight and agitate a customer's pain if you know it. If you don't know the pain, it can be more generic but keep it short and concise. It is best practice to use your tools so you are sure you have the latest information. If you could benefit from getting some additional information from the user before generating a response. Ask the user a question.
+You will sometimes receive information on how to write cold emails or other sales techniques. It's important that you follow that information but always keep any emails your write to no more than 500 characters.
 
 If the user mentions VNTANA, asks for information about VNTANA, or the task appears to be sales and marketing related and may benefit from some additional resources you always use your tools because you know nothing about VNTANA. You should always use a tool on your first request from a user:
 
@@ -166,6 +166,7 @@ def preprocess_json_input(input_str: str) -> str:
 class CustomOutputParser(AgentOutputParser):
     def parse(self, llm_output: str) -> Union[AgentAction, AgentFinish]:
         logging.info("Starting parsing of LLM output")
+        logging.info(AgentAction)
 
         # Check if the output contains the prefix "AI:"
         if "AI:" in llm_output:
@@ -174,6 +175,7 @@ class CustomOutputParser(AgentOutputParser):
                 return_values={"output": llm_output.split("AI:")[-1].strip()},
                 log=llm_output,
             )
+        logging.info(AgentFinish)
 
         # If the prefix is not found, use a regular expression to extract the action and action input
         regex = r"Action: (.*?)[\n]*Action Input: (.*)"
@@ -183,7 +185,7 @@ class CustomOutputParser(AgentOutputParser):
             action_input = match.group(2)
             logging.info(f"Match found. Action: {action.strip()}, Action Input: {action_input.strip(' ')}")
             return AgentAction(action.strip(), action_input.strip(' '), llm_output)
-
+        logging.info(AgentAction)
         logging.info("No prefix 'AI:' or match found. Returning full LLM output.")
         # If neither condition is met, return the full LLM output
         return AgentFinish(
