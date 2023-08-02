@@ -6,7 +6,7 @@ from langchain.callbacks.streamlit import StreamlitCallbackHandler  # Import Str
 st.set_page_config(page_title="VNTANA Sales", page_icon="Profile_Avatar.jpg")
 st.sidebar.image("Profile_Avatar.jpg")
 st.info("`I am an AI that can help you generate sales and marketing content. For example, I can write email sequences, generate marketing copy, and more."
-    "To get the best results, include VNTANA in your request and I can access VNTANA's vector database.`")
+    "To get the best results, include VNTANA in your request and I can access VNTANA's vector database. You can also say somethign like 'use your tools'`")
 
 from typing import Any, List, Optional, Sequence, Tuple, Union, Type
 import json
@@ -375,11 +375,7 @@ def query_weaviate(input):
         response = openai.ChatCompletion.create(
           model="gpt-4",
           messages=[
-                {"role": "system", "content": """As an AI assistant highly skilled in 3D related topics, including realtime 3D and WebGL, you work for VNTANA, a company offering a 3D infrastructure platform designed for managing, optimizing, and distributing 3D assets at scale. With your expertise in semantic search and the Weaviate vector database, your task is to interpret the input from a VNTANA customer support person. You need to understand the context of the problem or inquiry, particularly as it relates to areas like optimization algorithms, 3D workflows, digital transformation, and use of 3D designs across various channels. Generate a list of up to 4 relevant search concepts that can be used to assist in composing a response to the user's query. Each concept should be a concise phrase or short sentence, separated by commas."
-
-Remember, it's important to offer a clear example in the prompt to demonstrate the expected output format. For instance:
-
-"For example, if the customer support person's input is 'A client is struggling with optimizing their realtime 3D assets for web display', you might generate the concepts: 'Realtime 3D asset optimization, WebGL best practices, 3D workflows for web, digital transformation with 3D designs'"""},
+                {"role": "system", "content": """You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate relevant search concepts from input of a VNTANA salesperson. These concepts should be focused on key aspects of VNTANA's services, including but not limited to optimization algorithms, 3D workflows, digital transformation, and use of 3D designs in various channels. The goal is to inform a subsequent AI, which will assist in composing response to the VNTANA salesperson’s request. Please generate a list of up to 4 relevant concepts that will be helpful to search in order to answer the user's query. If the user requests a specific type of content, then one of your concepts should be that type of content. For example, if the user said, 'Write me a cold 4 email sequence that I can send to industrial manufacturing companies about the benefits of VNTANA', then you should generate 'cold email' as one of the concepts. These concepts should be separated by commas.'"""},
                 {"role": "user", "content": "Please generate your semantic search query."},
                 {"role": "assistant", "content": input}
             ]
@@ -410,9 +406,9 @@ additional_tools = [
         description="useful for when you need to answer questions about current events or the current state of the world"
     ),
     Tool(
-        name = "VNTANA Customer support tool",
+        name = "VNTANA Sales and Marketing Tool",
         func=vntana.run,  # Use run here instead of arun
-        description="useful whenever assisting a vntana user in answering a question related to 3D or customer support"
+        description="useful when you need to write any information about VNTANA or sales and marketing copy"
     )
 ]
 
