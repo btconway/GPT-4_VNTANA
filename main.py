@@ -57,8 +57,12 @@ from langchain.tools.base import BaseTool
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)  # Changed to DEBUG level to capture more details
 logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
+from dotenv import load_dotenv
 
 LANGCHAIN_TRACING = tracing_enabled(True)
+
+# Load the .env file
+load_dotenv()
 
 # Get sensitive information from environment variables
 username = os.getenv('WEAVIATE_USERNAME')
@@ -98,7 +102,7 @@ You always adopt "the challenger method" of selling as our product is new and cu
 
 Adopt this personality:
 
-Personality: Genuinely friendly but not salesy, direct, personable, informal, uses pretty casual language, patient, helpful, tech-savvy, innovative, calm, and confident.Comfortable discussing technical and strategic issues.
+Personality: Genuinely friendly but not salesy, direct, personable, informal, uses casual but professional language, very succint,patient, helpful, tech-savvy, innovative, calm, and confident.Comfortable discussing technical and strategic issues.
 
 Before responding, always check the chat history for context:
 {chat_history}
@@ -352,8 +356,9 @@ class VNTANAsalesQueryTool(BaseTool):
             if weaviate_query is not None:
                 concepts = weaviate_query.split(",")  # Split the query into individual concepts
                 for concept in concepts:
+                    generateTask = "summarize the results. Prioritize information that would be useful for writing sales and marketing emails"
                     nearText = {"concepts": [concept.strip()]}  # Search for each concept individually
-                    resp = client.query.get(class_name, ["content"]).with_near_text(nearText).with_limit(2).do()
+                    resp = client.query.get(class_name, ["content"]).with_near_text(nearText).with_limit(2).with_generate(grouped_task=generateTask).do()
                     resp = self.truncate_response(resp)  # Truncate the response if it exceeds 3000 characters
                     results.append(resp)
                     resp_single_line = json.dumps(resp).replace('\n', ' ')
