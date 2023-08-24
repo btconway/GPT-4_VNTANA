@@ -169,7 +169,6 @@ def preprocess_json_input(input_str: str) -> str:
 class CustomOutputParser(AgentOutputParser):
     def parse(self, llm_output: str) -> Union[AgentAction, AgentFinish]:
         logging.info("Starting parsing of LLM output")
-        logging.info(AgentAction)
 
         # Check if the output contains the prefix "AI:"
         if "AI:" in llm_output:
@@ -196,7 +195,7 @@ class CustomOutputParser(AgentOutputParser):
             log=llm_output,
         )
 
-logging.basicConfig(level=logging.INFO)  # Set logging level to INFO
+
 retry_parser = RetryWithErrorOutputParser.from_llm(
     parser=CustomOutputParser(), llm=OpenAI(temperature=0)
 )
@@ -352,17 +351,14 @@ class VNTANAsalesQueryTool(BaseTool):
         results = []  # Initialize an empty list to store the results
         try:
             weaviate_query = query_weaviate(query)
+            logging.info(weaviate_query)
             if weaviate_query is not None:
-                concepts = weaviate_query.split(",")  # Split the query into individual concepts
-                for concept in concepts:
-                    generateTask = "summarize the results. Prioritize information that would be useful for writing sales and marketing emails"
-                    nearText = {"concepts": [concept.strip()]}  # Search for each concept individually
-                    resp = client.query.get(class_name, ["content"]).with_near_text(nearText).with_limit(2).with_generate(grouped_task=generateTask).do()
-                    resp = self.truncate_response(resp)  # Truncate the response if it exceeds 3000 characters
-                    results.append(resp)
-                    resp_single_line = json.dumps(resp).replace('\n', ' ')
-                    logging.info(f"Resp: {resp_single_line}")
-                    logging.info(resp)  # Changed from print to logging.info
+                concept = weaviate_query  # Split the query into individual concepts
+                nearText = {"concepts": [concept]}  # Search for each concept individually
+                resp = client.query.get(class_name, ["content"]).with_near_text(nearText).with_limit(4).do()
+                resp = self.truncate_response(resp)  # Truncate the response if it exceeds 3000 characters
+                results.append(resp)
+                logging.info(resp)  # Changed from print to logging.info
         except Exception as e:
             logging.error(f"Error occurred while querying: {e}")
             raise e
@@ -381,15 +377,13 @@ def query_weaviate(input):
         response = openai.ChatCompletion.create(
           model="gpt-4",
           messages=[
-                {"role": "system", "content": """You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate relevant search concepts from input of a VNTANA salesperson. These concepts should be focused on key aspects of VNTANA's services, including but not limited to optimization algorithms, 3D workflows, digital transformation, and use of 3D designs in various channels. The goal is to inform a subsequent AI, which will assist in composing response to the VNTANA salesperson’s request. Please generate a list of up to 3 relevant concepts that will be helpful to search in order to answer the user's query. If the user requests a specific type of content, then one of your concepts should be that type of content. For example, if the user said, 'Write me a cold 4 email sequence that I can send to industrial manufacturing companies about the benefits of VNTANA', then you should generate 'cold email' as one of the concepts. These concepts should be separated by commas.'"""},
-                {"role": "user", "content": "Please generate your semantic search query."},
+                {"role": "system", "content": """You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate relevant search concepts from input of a VNTANA salesperson. These concepts should be focused on key aspects of VNTANA's services, including but not limited to optimization algorithms, 3D workflows, digital transformation, and use of 3D designs in various channels. The goal is to inform a subsequent AI, which will assist in composing response to the VNTANA salesperson’s request. Please generate a list of up to 4 relevant concepts that will be helpful to search in order to answer the user's query. If the user requests a specific type of content, then one of your concepts should be that type of content. For example, if the user said, 'Write me a cold 4 email sequence that I can send to industrial manufacturing companies about the benefits of VNTANA', then you should generate 'cold email' as one of the concepts. These concepts should be separated by commas.'"""},
+                {"role": "user", "content": "Please generate your semantic search query based on the user request:"},
                 {"role": "assistant", "content": input}
             ]
         )
         weaviate_query = response['choices'][0]['message']['content']
-        weaviate_query_single_line = weaviate_query.replace('\n', ' ')  # Replace newline characters with spaces
         logging.info("Search query generated successfully.")  # Changed from print to logging.info
-        logging.info(f"Query: {weaviate_query_single_line}")  # Changed from print to logging.info
         return weaviate_query
     except Exception as e:
         logging.error(f"Error generating query with OpenAI: {e}")  # Changed from print to logging.error
