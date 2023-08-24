@@ -337,7 +337,7 @@ class VNTANAsalesQueryTool(BaseTool):
     description = "useful whenever writing copy for sales and marketing or looking for information about VNTANA"
     args_schema: Type[VNTANAsalesQuerySchema] = VNTANAsalesQuerySchema
 
-    def truncate_response(self, response: str, max_length: int = 2750) -> str:
+    def truncate_response(self, response: str, max_length: int = 2500) -> str:
         """Truncate the response if it exceeds the max_length."""
         if len(response) > max_length:
             return response[:max_length]
