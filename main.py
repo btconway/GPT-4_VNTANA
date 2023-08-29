@@ -443,10 +443,14 @@ for msg in st.session_state.chat_history:
     st.chat_message(msg["role"]).write(msg["content"])
 
 def parse_ai_response(response_dict):
+    # Check if response_dict is a string and a valid JSON string; if so, convert it to a dictionary
+    if isinstance(response_dict, str) and is_json(response_dict):
+        response_dict = json.loads(response_dict)
+
     # If the response is not a JSON string
     if "Non-JSON Response" in response_dict:
         return response_dict["Non-JSON Response"]
-    
+
     # Extract the AI's response from the response dictionary
     ai_response = response_dict.get("AI", "")
     
