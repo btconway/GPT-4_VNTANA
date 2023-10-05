@@ -437,7 +437,7 @@ if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
 # Streamlit interaction
-st.title("VNTANA Customer Support Assistant")
+st.title("VNTANA Sales AI")
 
 for msg in st.session_state.chat_history:
     st.chat_message(msg["role"]).write(msg["content"])
