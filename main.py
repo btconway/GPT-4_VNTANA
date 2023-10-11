@@ -522,7 +522,10 @@ if prompt := st.chat_input():
         st_callback = StreamlitCallbackHandler(st.container())
         # Convert the chat history into a format that chain.run() can handle
         chat_history_str = "\n".join([f"{msg['role']}: {msg['content']}" for msg in st.session_state.chat_history])
-        response = chain.run(chat_history_str, callbacks=[st_callback])  # Pass chat history instead of just the prompt
+        
+        # Adjusting the way we call chain.run()
+        response = chain.run({'input': prompt, 'chat_history': chat_history_str}, callbacks=[st_callback])
+        
         # Check if response is a JSON string before trying to load it
         if is_json(response):
             response_dict = json.loads(response)
