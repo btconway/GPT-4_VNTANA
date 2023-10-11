@@ -81,11 +81,6 @@ client = weaviate.Client(
         "X-Openai-Api-Key": openai_api_key}
 )
 
-ai_options = ['AI Type 1', 'AI Type 2', 'AI Type 3']
-selected_ai = st.selectbox('Choose AI Type:', ai_options)
-
-st.write(f'You selected: {selected_ai}')
-
 ai_options = ['General sales helper', 'Sequence Writer', 'Email Responder']
 selected_ai = st.selectbox('Choose AI Type:', ai_options)
 
