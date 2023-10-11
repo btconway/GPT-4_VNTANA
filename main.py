@@ -340,7 +340,7 @@ class VNTANAsalesQueryTool(BaseTool):
             logging.info(vectors)
             if vectors is not None:
                 #add fucntionality to pull all property names from a class
-                resp = client.query.get(class_name, ["content"]).with_near_vector(vectors).with_limit(4).do()
+                resp = client.query.get(class_name, ["content"]).with_near_vector(dict.vectors).with_limit(4).do()
                 resp = self.truncate_response(resp)  # Truncate the response if it exceeds 3000 characters
                 results.append(resp)
                 logging.info(resp)  # Changed from print to logging.info
