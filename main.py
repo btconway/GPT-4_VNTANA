@@ -40,7 +40,7 @@ from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 #from langchain.cache import RedisSemanticCache
 from langchain.llms import OpenAI
-from langchain.memory import ConversationTokenBufferMemory
+from langchain.memory import ConversationSummaryBufferMemory
 from langchain.prompts.base import BasePromptTemplate
 from langchain.prompts.chat import (
     ChatPromptTemplate,
@@ -428,7 +428,7 @@ tools.extend(additional_tools) # Add the additional tools to the original list
 
 llm = OpenAI(temperature=0.0, model="gpt-3.5-turbo-16k", streaming=False)
 
-memory = ConversationTokenBufferMemory(memory_key="chat_history", return_messages=True, max_tokens=4200, llm=llm)
+memory = ConversationSummaryBufferMemory(llm=llm, max_token_limit=4200, return_messages=True)
 
 # Create the agent and run it
 st_container = st.container()
