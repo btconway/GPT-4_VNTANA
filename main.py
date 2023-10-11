@@ -312,6 +312,7 @@ class StreamHandler(BaseCallbackHandler):
             raise ValueError(f"Invalid display_method: {self.display_method}")
 
 class_name = "VNTANAsalesAgent2"
+embedding_list = []
 
 class VNTANAsalesQuerySchema(BaseModel):
     query: str = Field(description="should be a search query")
@@ -327,7 +328,7 @@ class VNTANAsalesQueryTool(BaseTool):
             return response[:max_length]
         return response
 
-    
+    #I really need to find a way to better search for what I need. 
     def _run(
         self, 
         query: str, 
@@ -335,15 +336,11 @@ class VNTANAsalesQueryTool(BaseTool):
     ) -> dict:
         results = []  # Initialize an empty list to store the results
         try:
-            weaviate_query = query_weaviate(query)
-            logging.info(weaviate_query)
-            if (weaviate_query is not None and ai_options[0]) or ai_options[1]:
-                concepts = weaviate_query
-            else:
-                concepts = [prompt]  # Split the query into individual concepts
-            for concept in concepts:
-                nearText = {"concepts": [concept]}  # Search for each concept individually
-                resp = client.query.get(class_name, ["content"]).with_near_text(nearText).with_limit(4).do()
+            vectors = vectorize(search_ai(query))
+            logging.info(vectors)
+            if vectors is not None:
+                #add fucntionality to pull all property names from a class
+                resp = client.query.get(class_name, ["content"]).with_near_vector(vectors).with_limit(4).do()
                 resp = self.truncate_response(resp)  # Truncate the response if it exceeds 3000 characters
                 results.append(resp)
                 logging.info(resp)  # Changed from print to logging.info
@@ -359,13 +356,45 @@ class VNTANAsalesQueryTool(BaseTool):
     ) -> dict:
         pass  # Dummy implementation
 
+def search_ai(user_input):
+    response = openai.ChatCompletion.create(
+          model="gpt-4",
+          messages=[
+                {"role": "system", "content": """You are an AI who works for VNTANA. <vntana_company_description>
+VNTANA is a tech company focused on 3D and augmented reality (AR) solutions to bolster digital commerce and advertising. They offer a comprehensive platform with several key features:
+3D Digital Asset Management (DAM): Provides a centralized hub for digital assets, streamlining 3D workflows, and facilitating secure collaboration with role-based access.
+Intelligent Optimization™: Automates 3D file optimization up to 99% while maintaining high visual quality, crucial for AR and web-based 3D experiences.
+3D Web Viewer: Enables brands to showcase products in 3D and AR on any device, with easy uploading and sharing of 3D models.
+3D eCommerce: Enhances online conversion rates and reduces returns by offering high-quality, fast-loading 3D images on websites.
+3D Task Manager (ModelOps™): Aids in custom 3D pipeline management, simplifying complex tasks like file format conversions.
+3D Digital Showroom: Allows for selling before manufacturing by replacing physical samples with 3D assets, also offering AR-enabled 3D web viewers for virtual product testing.
+VNTANA's platform is geared towards aiding brands in navigating the transition to 3D and AR-enhanced digital interactions, with a focus on improving online conversion rates, reducing returns, and refining the customer experience through interactive 3D/AR viewers and optimized 3D content.
+</vntana_company_description> Your task is to come up with up to 4 relevant pieces of information that would be helpful to know from VNTANA's vector database. You need to think about what parts of the VNTANA product might be relevant when generating your 4 responses. For example, if a user said 'write a 3 email sequence to the aftermarket automotive industry' your response might look like: 'aftermarket automotive industry, ecommerce benefits for automotive, 3D ecommerce case studies, vntana clients in automotive industry' Your responses should be in the format: 'keyword or phrase 1, keyword or phrase 2, keyword or phrase 3, keyword or phrase 4'.Use the provided company description as a reference when generating your responses. If you're unsure about a response, think it through and refine your answer."""},
+                {"role": "user", "content": "Please generate your questions search query based on the user request:"},
+                {"role": "assistant", "content": user_input}
+            ]
+        )
+    key_phrases = response['choices'][0]['message']['content']
+    logging.info("Key phrases: " + key_phrases)
+    return key_phrases
+#embeddings function
+def vectorize(key_phrases):
+    for key_phrase in key_phrases:
+        response = openai.Embedding.create(
+            input=key_phrase,
+            model="text-embedding-ada-002"
+        )
+        embeddings = response['data'][0]['embedding']
+        return embeddings
+    embedding_list.append(embeddings)
+
 def query_weaviate(input):
     try:
         openai.api_key = openai_api_key
         if selected_ai == 'General sales helper':
             query_instructions = "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate 4 relevant search concepts that can be used to assist in composing a response to the user's query. Each concept should be a concise phrase or short sentence, separated by commas."
         elif selected_ai == 'Sequence Writer':
-            query_instructions = "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate 4 relevant search concepts that can be used to assist in composing a response to the user's query. Each concept should be a concise phrase or short sentence, separated by commas. One concept should be the relevant industry that the email is directed towards. The other concepts will be dependent on the user's input."
+            query_instructions = "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate 4 relevant search concepts that can be used to assist in composing a response to the user's query. Each concept should be a concise phrase or short sentence, separated by commas. One concept should be the relevant industry that the email sequence is directed towards. The other concepts will be dependent on the user's input."
         else:
             logging.info("Selected AI not supported, exiting function.")
             return None
@@ -515,12 +544,3 @@ if prompt := st.chat_input():
 
         st.write(ai_response)
         st.session_state.chat_history.append({"role": "assistant", "content": ai_response})  # Add AI response to chat history
-
-
-
-
-
-
-
-
-
