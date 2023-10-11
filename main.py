@@ -520,11 +520,9 @@ if prompt := st.chat_input():
     st.session_state.chat_history.append({"role": "user", "content": prompt})  # Add user message to chat history
     with st.chat_message("AI"):
         st_callback = StreamlitCallbackHandler(st.container())
-        # Convert the chat history into a format that chain.run() can handle
-        chat_history_str = "\n".join([f"{msg['role']}: {msg['content']}" for msg in st.session_state.chat_history])
         
-        # Adjusting the way we call chain.run()
-        response = chain.run({'input': prompt, 'chat_history': chat_history_str}, callbacks=[st_callback])
+        # Adjusting the way we call chain.run() to pass the chat history list directly
+        response = chain.run({'input': prompt, 'chat_history': st.session_state.chat_history}, callbacks=[st_callback])
         
         # Check if response is a JSON string before trying to load it
         if is_json(response):
