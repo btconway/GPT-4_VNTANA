@@ -81,6 +81,11 @@ client = weaviate.Client(
         "X-Openai-Api-Key": openai_api_key}
 )
 
+ai_options = ['AI Type 1', 'AI Type 2', 'AI Type 3']
+selected_ai = st.selectbox('Choose AI Type:', ai_options)
+
+st.write(f'You selected: {selected_ai}')
+
 ai_options = ['General sales helper', 'Sequence Writer', 'Email Responder']
 selected_ai = st.selectbox('Choose AI Type:', ai_options)
 
@@ -91,8 +96,24 @@ file_name = selected_ai.replace(" ", "_") + ".txt"
 with open(file_name, 'r') as file:
     content = file.read()
 
-# Use the content as your PREFIX
+# Define the prompt template
 PREFIX = content
+
+FORMAT_INSTRUCTIONS ="""To use a tool, please use the following format:
+
+```
+Thought: Do I need to use a tool? Yes
+Action: the action to take, should be one of [{tool_names}]
+Action Input: the input to the action
+Observation: the result of the action
+```
+
+Whenever you use a tool, you must wait until your receive the results of the tool before responding to the Human.When you have a response to say to the Human, or if you do not need to use a tool, you MUST use the format:
+
+```
+Thought: Do I need to use a tool? No
+"AI:" [your response here]
+```"""
 
 SUFFIX = """Begin!
 REMEMBER, you must ALWAYS follow your FORMAT INSTRUCTIONS when responding to the Human.
