@@ -441,7 +441,7 @@ additional_tools = [
 
 tools.extend(additional_tools) # Add the additional tools to the original list
 
-llm = OpenAI(temperature=0.0, model="gpt-3.5-turbo-16k", streaming=False)
+llm = OpenAI(temperature=0.0, model="gpt-4", streaming=False)
 
 memory = ConversationTokenBufferMemory(memory_key="chat_history", return_messages=True, max_tokens=4200, llm=llm)
 
@@ -451,7 +451,7 @@ llm = ChatOpenAI(
     temperature=0.4, 
     callbacks=[StreamlitCallbackHandler(parent_container=st_container, expand_new_thoughts=False, collapse_completed_thoughts=True)], 
     streaming=True,
-    model="gpt-3.5-turbo-16k",
+    model="gpt-4",
 )
 
 # Create the agent
