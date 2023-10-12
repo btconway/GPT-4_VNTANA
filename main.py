@@ -92,7 +92,7 @@ with open(file_name, 'r') as file:
     content = file.read()
 
 # Define the prompt template
-PREFIX = content + """If the user mentions VNTANA, asks for information about VNTANA, or the task appears to be sales and marketing related and may benefit from some additional resources you always use your tools because you know nothing about VNTANA. You should always use a tool on your first request from a user:
+PREFIX = content + """If the user mentions VNTANA, asks for information about VNTANA, or the user's request is to write a sequence, email or other piece of sales and marketing copy you must use the VNTANA Sales and Marketing Tool. You should always use a tool on your first request from a user:
 
 {tools}
 ----
@@ -340,7 +340,7 @@ class VNTANAsalesQueryTool(BaseTool):
             logging.info(vectors)
             if vectors is not None:
                 #add fucntionality to pull all property names from a class
-                resp = client.query.get(class_name, ["content"]).with_near_vector(dict.vectors).with_limit(4).do()
+                resp = client.query.get(class_name, ["content"]).with_near_vector(vectors).with_limit(4).do()
                 resp = self.truncate_response(resp)  # Truncate the response if it exceeds 3000 characters
                 results.append(resp)
                 logging.info(resp)  # Changed from print to logging.info
@@ -377,6 +377,7 @@ VNTANA's platform is geared towards aiding brands in navigating the transition t
     key_phrases = response['choices'][0]['message']['content']
     logging.info("Key phrases: " + key_phrases)
     return key_phrases
+
 #embeddings function
 def vectorize(key_phrases):
     for key_phrase in key_phrases:
