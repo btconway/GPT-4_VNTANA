@@ -448,7 +448,7 @@ memory = ConversationTokenBufferMemory(memory_key="chat_history", return_message
 # Create the agent and run it
 st_container = st.container()
 llm = ChatOpenAI(
-    temperature=0.4, 
+    temperature=0.5, 
     callbacks=[StreamlitCallbackHandler(parent_container=st_container, expand_new_thoughts=False, collapse_completed_thoughts=True)], 
     streaming=True,
     model="gpt-4",
