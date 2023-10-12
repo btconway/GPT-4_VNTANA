@@ -451,7 +451,7 @@ llm = ChatOpenAI(
     temperature=0.4, 
     callbacks=[StreamlitCallbackHandler(parent_container=st_container, expand_new_thoughts=False, collapse_completed_thoughts=True)], 
     streaming=True,
-    model="gpt-4",
+    model="gpt-3.5-turbo-16k",
 )
 
 # Create the agent
