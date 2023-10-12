@@ -92,7 +92,7 @@ with open(file_name, 'r') as file:
     content = file.read()
 
 # Define the prompt template
-PREFIX = content + """If the user mentions VNTANA, asks for information about VNTANA, or the user's request is to write a sequence, email or other piece of sales and marketing copy you must use the VNTANA Sales and Marketing Tool. You should always use a tool on your first request from a user:
+PREFIX = content + """If you are asked to write any copy at all (e.g. email sequences, prospecting messages, emails, one page summaries, etc.) you must use the VNTANA Sales and Marketing Tool. You should always use a tool on your first request from a user:
 
 {tools}
 ----
