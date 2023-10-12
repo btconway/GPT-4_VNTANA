@@ -335,7 +335,7 @@ class VNTANAsalesQueryTool(BaseTool):
         ) -> dict:
         results = []  # Initialize an empty list to store the results
         try:
-            generate_prompt = "summarize these results to make them useful for a sales and marketing AI that works at VNTANA. Here is a description of VNTANA: VNTANA is a tech-forward company specializing in 3D and augmented reality (AR) solutions to enhance digital commerce and advertising. The company offers a comprehensive platform that streamlines 3D workflows, automates 3D file optimization, and enables interactive 3D/AR experiences on any device. VNTANA's solutions aim to improve online conversion rates, reduce returns, and refine customer experience, making it an ideal partner for brands transitioning to AR-enhanced digital interactions."
+            generate_prompt = "Summarize the following content: {content}. Make it useful for a sales and marketing AI that works at VNTANA. Here is a description of VNTANA: VNTANA is a tech-forward company specializing in 3D and augmented reality (AR) solutions to enhance digital commerce and advertising. The company offers a comprehensive platform that streamlines 3D workflows, automates 3D file optimization, and enables interactive 3D/AR experiences on any device. VNTANA's solutions aim to improve online conversion rates, reduce returns, and refine customer experience, making it an ideal partner for brands transitioning to AR-enhanced digital interactions."
             vectors_list = vectorize(search_ai(query))
             logging.info(vectors_list)
             for vector in vectors_list:  # Loop through each vector dictionary
