@@ -321,7 +321,7 @@ class VNTANAsalesQueryTool(BaseTool):
     description = "useful whenever writing copy for sales and marketing or looking for information about VNTANA"
     args_schema: Type[VNTANAsalesQuerySchema] = VNTANAsalesQuerySchema
 
-    def truncate_response(self, response: str, max_length: int = 2500) -> str:
+    def truncate_response(self, response: str, max_length: int = 1500) -> str:
         """Truncate the response if it exceeds the max_length."""
         if len(response) > max_length:
             return response[:max_length]
@@ -335,10 +335,11 @@ class VNTANAsalesQueryTool(BaseTool):
         ) -> dict:
         results = []  # Initialize an empty list to store the results
         try:
+            generate_prompt = "summarize these results to make them useful for a sales and marketing AI that works at VNTANA. Here is a description of VNTANA: VNTANA is a tech-forward company specializing in 3D and augmented reality (AR) solutions to enhance digital commerce and advertising. The company offers a comprehensive platform that streamlines 3D workflows, automates 3D file optimization, and enables interactive 3D/AR experiences on any device. VNTANA's solutions aim to improve online conversion rates, reduce returns, and refine customer experience, making it an ideal partner for brands transitioning to AR-enhanced digital interactions."
             vectors_list = vectorize(search_ai(query))
             logging.info(vectors_list)
             for vector in vectors_list:  # Loop through each vector dictionary
-                resp = client.query.get(class_name, ["content"]).with_near_vector(vector).with_autocut(1).do()
+                resp = client.query.get(class_name, ["content"]).with_near_vector(vector).with_autocut(1).with_generate(single_prompt=generate_prompt).do()
                 resp = self.truncate_response(resp)  # Truncate the response if it exceeds 3000 characters
                 results.append(resp)
                 logging.info(resp)  # Changed from print to logging.info
