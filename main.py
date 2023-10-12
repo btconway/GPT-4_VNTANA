@@ -312,7 +312,6 @@ class StreamHandler(BaseCallbackHandler):
             raise ValueError(f"Invalid display_method: {self.display_method}")
 
 class_name = "VNTANAsalesAgent2"
-embedding_list = []
 
 class VNTANAsalesQuerySchema(BaseModel):
     query: str = Field(description="should be a search query")
@@ -330,17 +329,16 @@ class VNTANAsalesQueryTool(BaseTool):
 
     #I really need to find a way to better search for what I need. 
     def _run(
-        self, 
-        query: str, 
-        run_manager: Optional[CallbackManagerForToolRun] = None,
-    ) -> dict:
+            self, 
+            query: str, 
+            run_manager: Optional[CallbackManagerForToolRun] = None,
+        ) -> dict:
         results = []  # Initialize an empty list to store the results
         try:
-            vectors = vectorize(search_ai(query))
-            logging.info(vectors)
-            if vectors is not None:
-                #add fucntionality to pull all property names from a class
-                resp = client.query.get(class_name, ["content"]).with_near_vector(vectors).with_limit(4).do()
+            vectors_list = vectorize(search_ai(query))
+            logging.info(vectors_list)
+            for vector in vectors_list:  # Loop through each vector dictionary
+                resp = client.query.get(class_name, ["content"]).with_near_vector(vector).with_limit(4).do()
                 resp = self.truncate_response(resp)  # Truncate the response if it exceeds 3000 characters
                 results.append(resp)
                 logging.info(resp)  # Changed from print to logging.info
@@ -348,6 +346,7 @@ class VNTANAsalesQueryTool(BaseTool):
             logging.error(f"Error occurred while querying: {e}")
             raise e
         return {"results": results}  # Return the results as a dictionary
+
 
     def _arun(
         self, 
@@ -380,14 +379,17 @@ VNTANA's platform is geared towards aiding brands in navigating the transition t
 
 #embeddings function
 def vectorize(key_phrases):
-    for key_phrase in key_phrases:
+    vectors_list = []  # Create a list to store each dictionary of embeddings
+    for key_phrase in key_phrases.split(", "):  # Split the key_phrases string by commas and iterate over them
         response = openai.Embedding.create(
             input=key_phrase,
             model="text-embedding-ada-002"
         )
-        embeddings = response['data'][0]['embedding']
-        return embeddings
-    embedding_list.append(embeddings)
+        vector = {"vector": response['data'][0]['embedding']}  # Store embedding in a dict
+        vectors_list.append(vector)
+    
+    return vectors_list
+
 
 def query_weaviate(input):
     try:
