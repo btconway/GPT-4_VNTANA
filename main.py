@@ -340,8 +340,8 @@ class VNTANAsalesQueryTool(BaseTool):
             vectors_list = vectorize(search_ai(query))
             logging.info(vectors_list)
             for vector in vectors_list:  # Loop through each vector dictionary
-                resp = client.query.get(class_name, ["content"]).with_near_vector(vector).with_autocut(1).with_limit(2).do()
-                resp = self.truncate_response(resp)  # Truncate the response if it exceeds 3000 characters
+                resp = client.query.get(class_name, ["content"]).with_near_vector(vector).with_autocut(1).with_limit(1).do()
+                resp = self.truncate_response(resp)  # Truncate the response if it exceeds 1200 characters
                 results.append(resp)
                 logging.info(resp)  # Changed from print to logging.info
         except Exception as e:
