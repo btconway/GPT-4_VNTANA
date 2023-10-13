@@ -1,7 +1,26 @@
 # Necessary imports
 from __future__ import annotations
+import json
+import logging
+import os
+import re
+import sys
+
 import streamlit as st
-from langchain.callbacks.streamlit import StreamlitCallbackHandler  # Import Streamlit callback
+import weaviate
+import openai
+from pydantic import BaseModel, Field
+from typing import Any, List, Optional, Sequence, Tuple, Union, Type
+
+from langchain import (
+    AgentExecutor, AgentOutputParser, load_tools, RetryWithErrorOutputParser, CallbackManagerForToolRun,
+    SerpAPIWrapper, Tool, Agent, validate_tools_single_input, BaseCallbackHandler, BaseLanguageModel, AgentFinish,
+    tracing_enabled, BaseCallbackManager, StreamingStdOutCallbackHandler, LLMChain, ChatOpenAI, OpenAI,
+    ConversationTokenBufferMemory, BasePromptTemplate, ChatPromptTemplate, HumanMessagePromptTemplate, 
+    MessagesPlaceholder, AgentAction, AIMessage, BaseMessage, BaseOutputParser, HumanMessage, SystemMessage,
+    BaseTool
+)
+from langchain.callbacks.streamlit import StreamlitCallbackHandler
 
 st.set_page_config(page_title="VNTANA Sales", page_icon="Profile_Avatar.jpg")
 st.sidebar.image("Profile_Avatar.jpg")
@@ -9,53 +28,6 @@ st.info("`I am an AI that can help you generate sales and marketing content. For
     "To get the best results, include VNTANA in your request and I can access VNTANA's vector database. You can also say somethign like 'use your tools'`")
 st.cache_resource.clear()
 
-
-from typing import Any, List, Optional, Sequence, Tuple, Union, Type
-import json
-import logging
-import os
-import re
-import sys
-import weaviate
-import openai
-from pydantic import BaseModel, Field
-from langchain.agents import (
-    AgentExecutor, 
-    AgentOutputParser, 
-    load_tools
-)
-from langchain.output_parsers import RetryWithErrorOutputParser
-from langchain.callbacks.manager import CallbackManagerForToolRun
-from langchain.utilities import SerpAPIWrapper
-from langchain.agents import Tool
-from langchain.agents.agent import Agent
-from langchain.agents.utils import validate_tools_single_input
-from langchain.callbacks.base import BaseCallbackHandler
-from langchain.base_language import BaseLanguageModel
-from langchain.schema import AgentFinish
-from langchain.callbacks import tracing_enabled
-from langchain.callbacks.base import BaseCallbackManager
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.chains import LLMChain
-from langchain.chat_models import ChatOpenAI
-#from langchain.cache import RedisSemanticCache
-from langchain.llms import OpenAI
-from langchain.memory import ConversationTokenBufferMemory
-from langchain.prompts.base import BasePromptTemplate
-from langchain.prompts.chat import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    MessagesPlaceholder,
-)
-from langchain.schema import (
-    AgentAction, 
-    AIMessage, 
-    BaseMessage, 
-    BaseOutputParser, 
-    HumanMessage, 
-    SystemMessage
-)
-from langchain.tools.base import BaseTool
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)  # Changed to DEBUG level to capture more details
 logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
