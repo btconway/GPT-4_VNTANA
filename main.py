@@ -56,18 +56,16 @@ from langchain.schema import (
 )
 from langchain.tools.base import BaseTool
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)  # Changed to DEBUG level to capture more details
-logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 LANGCHAIN_TRACING = tracing_enabled(True)
 
 
 # Get sensitive information from environment variables
-username = os.getenv('WEAVIATE_USERNAME')
-password = os.getenv('WEAVIATE_PASSWORD')
-openai_api_key = os.getenv('OPENAI_API_KEY')
+username = os.environ.get('WEAVIATE_USERNAME')
+password = os.environ.get('WEAVIATE_PASSWORD')
+openai_api_key = os.environ.get('OPENAI_API_KEY')
 serpapi_api_key = os.environ.get('SERPAPI_API_KEY')
-
 
 # creating a Weaviate client
 resource_owner_config = weaviate.AuthClientPassword(
