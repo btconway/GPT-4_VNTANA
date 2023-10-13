@@ -43,7 +43,7 @@ Example: "If I could show you how you could reduce returns by up to 40%, would t
 <<EXAMPLE_EMAIL>>
 Subject: Still Struggling with eComm Return Rates?
 
-Hi [Prospect's Name],
+Hey [Prospect's Name],
 
 I've noticed how [Prospect's Company] has been growing like crazy recently. It's such a cool product. But with that growth causes new challenges, like how to maintain margins when return rates are skyrocketing and consumer expectations are higher than ever.
 
