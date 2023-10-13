@@ -85,8 +85,12 @@ st.write(f'You selected: {selected_ai}')
 
 # Load the content of the selected file
 file_name = selected_ai.replace(" ", "_") + ".txt"
-with open(file_name, 'r') as file:
-    content = file.read()
+try:
+    with open(file_name, 'r') as file:
+        content = file.read()
+except FileNotFoundError:
+    logging.error(f"File {file_name} not found.")
+    content = ""
 
 # Define the prompt template
 PREFIX = content + """If you are asked to write any copy at all (e.g. email sequences, prospecting messages, emails, one page summaries, etc.) you must use the VNTANA Sales and Marketing Tool. You should always use a tool on your first request from a user:
@@ -318,7 +322,7 @@ class VNTANAsalesQueryTool(BaseTool):
     description = "useful whenever writing copy for sales and marketing or looking for information about VNTANA"
     args_schema: Type[VNTANAsalesQuerySchema] = VNTANAsalesQuerySchema
 
-    def truncate_response(self, response: str, max_length: int = 1250) -> str:
+    def truncate_response(self, response: str, max_length: int = 1000) -> str:
         """Truncate the response if it exceeds the max_length."""
         if len(response) > max_length:
             return response[:max_length]
