@@ -345,6 +345,7 @@ class VNTANAsalesQueryTool(BaseTool):
                 results.append(resp)
                 logging.info(resp)
                 reduce_response(results)
+                logging.info(results)
         except Exception as e:
             logging.error(f"Error occurred while querying: {e}")
             raise e
