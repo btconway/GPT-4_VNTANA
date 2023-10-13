@@ -11,9 +11,9 @@ import weaviate
 import openai
 from pydantic import BaseModel, Field
 from typing import Any, List, Optional, Sequence, Tuple, Union, Type
-
+from langchain.agents import AgentExecutor, AgentOutputParser
 from langchain import (
-    AgentExecutor, AgentOutputParser, load_tools, RetryWithErrorOutputParser, CallbackManagerForToolRun,
+  load_tools, RetryWithErrorOutputParser, CallbackManagerForToolRun,
     SerpAPIWrapper, Tool, Agent, validate_tools_single_input, BaseCallbackHandler, BaseLanguageModel, AgentFinish,
     tracing_enabled, BaseCallbackManager, StreamingStdOutCallbackHandler, LLMChain, ChatOpenAI, OpenAI,
     ConversationTokenBufferMemory, BasePromptTemplate, ChatPromptTemplate, HumanMessagePromptTemplate, 
@@ -432,15 +432,17 @@ agent = CustomChatAgent.from_llm_and_tools(llm, tools, output_parser=CustomOutpu
 chain = AgentExecutor.from_agent_and_tools(
             agent=agent, tools=tools, verbose=True, memory=memory, stop=["Observe:"])
 
-# Initialize the chat history in session state if it doesn't exist
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
+def initialize_chat_history():
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
 
-# Streamlit interaction
+def display_previous_messages():
+    for msg in st.session_state.chat_history:
+        st.chat_message(msg["role"]).write(msg["content"])
+
+initialize_chat_history()
 st.title("VNTANA Sales AI")
-
-for msg in st.session_state.chat_history:
-    st.chat_message(msg["role"]).write(msg["content"])
+display_previous_messages()
 
 def convert_to_json(data):
     """Convert a string to a JSON object. If the string is not in valid JSON format, 
