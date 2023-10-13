@@ -343,7 +343,8 @@ class VNTANAsalesQueryTool(BaseTool):
                 resp = client.query.get(class_name, ["content"]).with_near_vector(vector).with_autocut(1).with_limit(1).do()
                 resp = self.truncate_response(resp)  # Truncate the response if it exceeds 1200 characters
                 results.append(resp)
-                logging.info(resp)  # Changed from print to logging.info
+                logging.info(resp)
+                reduce_response(results)
         except Exception as e:
             logging.error(f"Error occurred while querying: {e}")
             raise e
@@ -392,7 +393,15 @@ def vectorize(key_phrases):
     
     return vectors_list
 
-
+def reduce_response(response):
+    #check chat history length, then reduce response so that the total of chat history plus the response does not exceed 7500 characters
+    chat_history_length = len(chat_history)
+    response_length = len(response)
+    total_length = chat_history_length + response_length
+    if total_length > 7500:
+        response = response[:7500 - chat_history_length]
+    return response
+    
 def query_weaviate(input):
     try:
         openai.api_key = openai_api_key
