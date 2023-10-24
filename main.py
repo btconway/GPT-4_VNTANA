@@ -78,13 +78,39 @@ client = weaviate.Client(
         "X-Openai-Api-Key": openai_api_key}
 )
 
-ai_options = ['General sales helper', 'Sequence Writer', 'Email Responder']
+ai_options = ['General sales helper', 'Sequence Writer']
 selected_ai = st.selectbox('Choose AI Type:', ai_options)
 
-st.write(f'You selected: {selected_ai}')
+
+if selected_ai == 'Sequence Writer':
+    persona_options = ['DPC', 'eCommerce and advertising', 'B2B']
+    selected_persona = st.selectbox('Choose persona:', persona_options)
+
+    industry_options = ['Fashion', 'Manufacturing & Industrial', 'Plumbing', 'Custom Tailoring']
+    selected_industry = st.selectbox('Choose industry:', industry_options)
+
+    persona_file_name = selected_persona.replace(" ", "_") + ".txt"
+    try:
+        with open(persona_file_name, 'r') as file:
+            persona_content = file.read()
+    except FileNotFoundError:
+        logging.error(f"File {persona_file_name} not found.")
+        persona_content = ""
+
+    # Load the content of the selected industry file
+    industry_file_name = selected_industry.replace(" ", "_") + ".txt"
+    try:
+        with open(industry_file_name, 'r') as file:
+            industry_content = file.read()
+    except FileNotFoundError:
+        logging.error(f"File {industry_file_name} not found.")
+        industry_content = ""
+else:
+    None
 
 # Load the content of the selected file
 file_name = selected_ai.replace(" ", "_") + ".txt"
+
 try:
     with open(file_name, 'r') as file:
         content = file.read()
@@ -92,8 +118,8 @@ except FileNotFoundError:
     logging.error(f"File {file_name} not found.")
     content = ""
 
-# Define the prompt template
-PREFIX = content + """If you are asked to write any copy at all (e.g. email sequences, prospecting messages, emails, one page summaries, etc.) you must use the VNTANA Sales and Marketing Tool. You should always use a tool on your first request from a user:
+if selected_ai == 'General sales helper':
+    PREFIX = content + """If you are asked to write any copy at all (e.g. email sequences, prospecting messages, emails, one page summaries, etc.) you must use the VNTANA Sales and Marketing Tool. You should always use a tool on your first request from a user:
 
 {tools}
 ----
@@ -107,6 +133,8 @@ You should only respond in the format as described below:
 Response Format:
 {format_instructions}
 """
+elif selected_ai == 'Sequence Writer':
+    PREFIX = content + """This is the persona you are writing to""" + persona_content + "\n\ " + """This is information about what the industry finds valuable:""" + industry_content + """\n\n If you are asked to write any copy at all (e.g. email sequences, prospecting messages, emails, one page summaries, etc.) you must use the VNTANA Sales and Marketing Tool. You should always use a tool on your first request from a user:"""
 
 FORMAT_INSTRUCTIONS ="""To use a tool, please use the following format:
 
@@ -360,7 +388,8 @@ class VNTANAsalesQueryTool(BaseTool):
         pass  # Dummy implementation
 
 def search_ai(user_input):
-    response = openai.ChatCompletion.create(
+    if selected_ai == 'General sales helper':
+        response = openai.ChatCompletion.create(
           model="gpt-4",
           messages=[
                 {"role": "system", "content": """You are an AI who works for VNTANA. <vntana_company_description>
@@ -369,7 +398,6 @@ VNTANA is a tech company focused on 3D and augmented reality (AR) solutions to b
 Intelligent Optimization™: Automates 3D file optimization up to 99% while maintaining high visual quality, crucial for AR and web-based 3D experiences.
 3D Web Viewer: Enables brands to showcase products in 3D and AR on any device, with easy uploading and sharing of 3D models.
 3D eCommerce: Enhances online conversion rates and reduces returns by offering high-quality, fast-loading 3D images on websites.
-3D Task Manager (ModelOps™): Aids in custom 3D pipeline management, simplifying complex tasks like file format conversions.
 3D Digital Showroom: Allows for selling before manufacturing by replacing physical samples with 3D assets, also offering AR-enabled 3D web viewers for virtual product testing.
 VNTANA's platform is geared towards aiding brands in navigating the transition to 3D and AR-enhanced digital interactions, with a focus on improving online conversion rates, reducing returns, and refining the customer experience through interactive 3D/AR viewers and optimized 3D content.
 </vntana_company_description> Your task is to come up with up to 3 relevant pieces of information that would be helpful to know from VNTANA's vector database. You need to think about what parts of the VNTANA product might be relevant when generating your 4 responses. For example, if a user said 'write a 3 email sequence to the aftermarket automotive industry' your response might look like: 'aftermarket automotive industry, vntana clients in automotive industry' Your responses should be in the format: 'keyword or phrase 1, keyword or phrase 2, keyword or phrase 3, keyword or phrase 4'.Use the provided company description as a reference when generating your responses. If you're unsure about a response, think it through and refine your answer."""},
@@ -377,6 +405,25 @@ VNTANA's platform is geared towards aiding brands in navigating the transition t
                 {"role": "assistant", "content": user_input}
             ]
         )
+    else:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                    {"role": "system", "content": """You are an AI who works for VNTANA as a semantic search assistant. <vntana_company_description>
+    VNTANA is a tech company focused on 3D and augmented reality (AR) solutions to bolster digital commerce and advertising. They offer a comprehensive platform with several key features:
+    3D Digital Asset Management (DAM): Provides a centralized hub for digital assets, streamlining 3D workflows, and facilitating secure collaboration with role-based access.
+    Intelligent Optimization™: Automates 3D file optimization up to 99% while maintaining high visual quality, crucial for AR and web-based 3D experiences.
+    3D Web Viewer: Enables brands to showcase products in 3D and AR on any device, with easy uploading and sharing of 3D models.
+    3D Digital Showroom: Allows for selling before manufacturing by replacing physical samples with 3D assets, also offering AR-enabled 3D web viewers for virtual product testing.
+    VNTANA's platform is geared towards aiding brands in navigating the transition to 3D and AR-enhanced digital interactions, with a focus on improving online conversion rates, reducing returns, and refining the customer experience through interactive 3D/AR viewers and optimized 3D content.
+    </vntana_company_description> Based on the selected industry, formulate a search query that is most likely to return relevant results. Come up with up to 3 relevant pieces of information that would be helpful to know from VNTANA's vector database based on the user input.
+                    
+                    You need to think about what parts of the VNTANA product might be relevant when generating your 3 responses and the provided context from the user should help. For example, if a user said 'write a 3 email sequence to the aftermarket automotive industry' your response might look like: 'aftermarket automotive industry, vntana clients in automotive industry' Your responses should be in the format: 'keyword or phrase 1, keyword or phrase 2, keyword or phrase 3, keyword or phrase 4'. Use the provided company description as a reference when generating your responses. If you're unsure about a response, think it through and refine your answer."""},
+                    {"role": "user", "content": "Please generate your questions search query based on the user request:"},
+                    {"role": "assistant", "content": "User query: " + user_input + "\n" + "Industry:" + industry_content + "\n" + "Persona:" + persona_content},
+                ]
+            )
+
     key_phrases = response['choices'][0]['message']['content']
     logging.info("Key phrases: " + key_phrases)
     return key_phrases
@@ -403,31 +450,6 @@ def reduce_response(response):
         response = response[:7500 - chat_history_length]
     return response
     
-def query_weaviate(input):
-    try:
-        openai.api_key = openai_api_key
-        if selected_ai == 'General sales helper':
-            query_instructions = "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate 4 relevant search concepts that can be used to assist in composing a response to the user's query. Each concept should be a concise phrase or short sentence, separated by commas."
-        elif selected_ai == 'Sequence Writer':
-            query_instructions = "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate 4 relevant search concepts that can be used to assist in composing a response to the user's query. Each concept should be a concise phrase or short sentence, separated by commas. One concept should be the relevant industry that the email sequence is directed towards. The other concepts will be dependent on the user's input."
-        else:
-            logging.info("Selected AI not supported, exiting function.")
-            return None
-        response = openai.ChatCompletion.create(
-          model="gpt-4",
-          messages=[
-                {"role": "system", "content": query_instructions},
-                {"role": "user", "content": "Please generate your semantic search query based on the user request:"},
-                {"role": "assistant", "content": input}
-            ]
-        )
-        weaviate_query = response['choices'][0]['message']['content']
-        logging.info("Search query generated successfully.")  # Changed from print to logging.info
-        return weaviate_query
-    except Exception as e:
-        logging.error(f"Error generating query with OpenAI: {e}")  # Changed from print to logging.error
-        return None
-
 search = SerpAPIWrapper()
 vntana = VNTANAsalesQueryTool()
 
@@ -546,7 +568,10 @@ def is_json(myjson):
 
 if prompt := st.chat_input():
     st.chat_message("user").write(prompt)
-    st.session_state.chat_history.append({"role": "user", "content": prompt})  # Add user message to chat history
+    if selected_ai == 'Sequence Writer':
+        st.session_state.chat_history.append({"role": "user", "content": prompt + """Use your tools if you haven't already."""})  # Add user message to chat history
+    else:
+        st.session_state.chat_history.append({"role": "user", "content": prompt})  # Add user message to chat history
     with st.chat_message("AI"):
         st_callback = StreamlitCallbackHandler(st.container())
         # Convert the chat history into a format that chain.run() can handle
@@ -561,3 +586,29 @@ if prompt := st.chat_input():
 
         st.write(ai_response)
         st.session_state.chat_history.append({"role": "assistant", "content": ai_response})  # Add AI response to chat history
+
+
+# def query_weaviate(input):
+#     try:
+#         openai.api_key = openai_api_key
+#         if selected_ai == 'General sales helper':
+#             query_instructions = "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate 4 relevant search concepts that can be used to assist in composing a response to the user's query. Each concept should be a concise phrase or short sentence, separated by commas."
+#         elif selected_ai == 'Sequence Writer':
+#             query_instructions = "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate 4 relevant search concepts that can be used to assist in composing a response to the user's query. Each concept should be a concise phrase or short sentence, separated by commas. One concept should be the relevant industry that the email sequence is directed towards. The other concepts will be dependent on the user's input."
+#         else:
+#             logging.info("Selected AI not supported, exiting function.")
+#             return None
+#         response = openai.ChatCompletion.create(
+#           model="gpt-4",
+#           messages=[
+#                 {"role": "system", "content": query_instructions},
+#                 {"role": "user", "content": "Please generate your semantic search query based on the user request:"},
+#                 {"role": "assistant", "content": input}
+#             ]
+#         )
+#         weaviate_query = response['choices'][0]['message']['content']
+#         logging.info("Search query generated successfully.")  # Changed from print to logging.info
+#         return weaviate_query
+#     except Exception as e:
+#         logging.error(f"Error generating query with OpenAI: {e}")  # Changed from print to logging.error
+#         return None
