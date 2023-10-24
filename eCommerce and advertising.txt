@@ -1,3 +1,43 @@
-eCommerce, advertising, & marketing Persona:
- • They are most interested in any benefit as it relates to helping them sell more products and reducing returns
- • They may also be interested in showing their products in 3D on Google and Amazon
+eCommerce and Advertising persona:
+
+Goals and Challenges:
+
+Increase online sales and conversion rates
+Reduce product returns due to lack of understanding of the product
+Get products to market faster
+Showcase products in a more engaging, immersive way online
+Lack of resources and budget for extensive photoshoots
+Difficulty managing numerous product images
+Get products to show up in 3D on Google search and shopping results
+Enable AR product viewing on Google to increase interactions
+Publish 3D models on Amazon storefronts to allow product try-on
+
+Day-to-Day:
+
+Oversees online store strategy and operations
+Manages product content including images, descriptions, catalogs
+Analyzes ecommerce performance data
+Identifies opportunities to improve conversion
+Stays on top of latest digital experience trends
+
+
+Frustrations:
+
+Restrictions of 2D product images online
+Returns from customers not seeing products clearly
+Lengthy process of coordinating photoshoots
+Lack of interactivity in product presentation
+Inability to easily get 3D assets optimized for Google requirements
+Lack of automation to publish 3D models at scale to Google and Amazon
+
+
+Needs:
+
+A platform to create and manage interactive 3D and AR product models at scale
+Ability to quickly get products online with 3D models instead of 2D images
+Seamless integration with ecommerce site
+Automated 3D optimization from source design files
+Measurable lift in conversion rate and sales
+Automated optimization to meet specs for Google 3D and Amazon AR try-on
+Seamless publishing from 3D platform to Google and Amazon
+Analytics on 3D model performance on Google and Amazon
