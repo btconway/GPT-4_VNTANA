@@ -82,7 +82,7 @@ ai_options = ['General sales helper', 'Sequence Writer', 'Email Responder']
 selected_ai = st.selectbox('Choose AI Type:', ai_options)
 
 
-if selected_ai == 'sequence writer':
+if selected_ai == 'Sequence Writer':
 
     persona_options = ['DPC', 'eCommerce and advertising', 'B2B']
     selected_persona = st.selectbox('Choose persona:', persona_options)
