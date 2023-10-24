@@ -83,7 +83,6 @@ selected_ai = st.selectbox('Choose AI Type:', ai_options)
 
 
 if selected_ai == 'Sequence Writer':
-
     persona_options = ['DPC', 'eCommerce and advertising', 'B2B']
     selected_persona = st.selectbox('Choose persona:', persona_options)
 
@@ -94,30 +93,32 @@ else:
 
 # Load the content of the selected file
 file_name = selected_ai.replace(" ", "_") + ".txt"
+
 try:
     with open(file_name, 'r') as file:
         content = file.read()
 except FileNotFoundError:
     logging.error(f"File {file_name} not found.")
     content = ""
-
+    
+if selected_ai == 'Sequence Writer':
 # Load the content of the selected persona file
-persona_file_name = selected_persona.replace(" ", "_") + ".txt"
-try:
-    with open(persona_file_name, 'r') as file:
-        persona_content = file.read()
-except FileNotFoundError:
-    logging.error(f"File {persona_file_name} not found.")
-    persona_content = ""
+    persona_file_name = selected_persona.replace(" ", "_") + ".txt"
+    try:
+        with open(persona_file_name, 'r') as file:
+            persona_content = file.read()
+    except FileNotFoundError:
+        logging.error(f"File {persona_file_name} not found.")
+        persona_content = ""
 
-# Load the content of the selected industry file
-industry_file_name = selected_industry.replace(" ", "_") + ".txt"
-try:
-    with open(industry_file_name, 'r') as file:
-        industry_content = file.read()
-except FileNotFoundError:
-    logging.error(f"File {industry_file_name} not found.")
-    industry_content = ""
+    # Load the content of the selected industry file
+    industry_file_name = selected_industry.replace(" ", "_") + ".txt"
+    try:
+        with open(industry_file_name, 'r') as file:
+            industry_content = file.read()
+    except FileNotFoundError:
+        logging.error(f"File {industry_file_name} not found.")
+        industry_content = ""
 
 # Define the prompt template
 PREFIX = content + """If you are asked to write any copy at all (e.g. email sequences, prospecting messages, emails, one page summaries, etc.) you must use the VNTANA Sales and Marketing Tool. You should always use a tool on your first request from a user:
