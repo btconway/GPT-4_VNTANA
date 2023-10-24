@@ -78,7 +78,7 @@ client = weaviate.Client(
         "X-Openai-Api-Key": openai_api_key}
 )
 
-ai_options = ['General sales helper', 'Sequence Writer', 'Email Responder']
+ai_options = ['General sales helper', 'Sequence Writer']
 selected_ai = st.selectbox('Choose AI Type:', ai_options)
 
 
@@ -88,21 +88,7 @@ if selected_ai == 'Sequence Writer':
 
     industry_options = ['Fashion', 'Manufacturing & Industrial', 'Plumbing', 'Custom Tailoring']
     selected_industry = st.selectbox('Choose industry:', industry_options)
-else:
-    None
 
-# Load the content of the selected file
-file_name = selected_ai.replace(" ", "_") + ".txt"
-
-try:
-    with open(file_name, 'r') as file:
-        content = file.read()
-except FileNotFoundError:
-    logging.error(f"File {file_name} not found.")
-    content = ""
-    
-if selected_ai == 'Sequence Writer':
-# Load the content of the selected persona file
     persona_file_name = selected_persona.replace(" ", "_") + ".txt"
     try:
         with open(persona_file_name, 'r') as file:
@@ -119,9 +105,21 @@ if selected_ai == 'Sequence Writer':
     except FileNotFoundError:
         logging.error(f"File {industry_file_name} not found.")
         industry_content = ""
+else:
+    None
 
-# Define the prompt template
-PREFIX = content + """If you are asked to write any copy at all (e.g. email sequences, prospecting messages, emails, one page summaries, etc.) you must use the VNTANA Sales and Marketing Tool. You should always use a tool on your first request from a user:
+# Load the content of the selected file
+file_name = selected_ai.replace(" ", "_") + ".txt"
+
+try:
+    with open(file_name, 'r') as file:
+        content = file.read()
+except FileNotFoundError:
+    logging.error(f"File {file_name} not found.")
+    content = ""
+
+if selected_ai == 'General sales helper':
+    PREFIX = content + """If you are asked to write any copy at all (e.g. email sequences, prospecting messages, emails, one page summaries, etc.) you must use the VNTANA Sales and Marketing Tool. You should always use a tool on your first request from a user:
 
 {tools}
 ----
@@ -135,6 +133,8 @@ You should only respond in the format as described below:
 Response Format:
 {format_instructions}
 """
+elif selected_ai == 'Sequence Writer':
+    PREFIX = content + """This is the persona you are writing to""" + persona_content + "\n\ " + """This is information about what the industry finds valuable:""" + industry_content + """\n\n If you are asked to write any copy at all (e.g. email sequences, prospecting messages, emails, one page summaries, etc.) you must use the VNTANA Sales and Marketing Tool. You should always use a tool on your first request from a user:"""
 
 FORMAT_INSTRUCTIONS ="""To use a tool, please use the following format:
 
@@ -450,31 +450,6 @@ def reduce_response(response):
         response = response[:7500 - chat_history_length]
     return response
     
-def query_weaviate(input):
-    try:
-        openai.api_key = openai_api_key
-        if selected_ai == 'General sales helper':
-            query_instructions = "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate 4 relevant search concepts that can be used to assist in composing a response to the user's query. Each concept should be a concise phrase or short sentence, separated by commas."
-        elif selected_ai == 'Sequence Writer':
-            query_instructions = "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate 4 relevant search concepts that can be used to assist in composing a response to the user's query. Each concept should be a concise phrase or short sentence, separated by commas. One concept should be the relevant industry that the email sequence is directed towards. The other concepts will be dependent on the user's input."
-        else:
-            logging.info("Selected AI not supported, exiting function.")
-            return None
-        response = openai.ChatCompletion.create(
-          model="gpt-4",
-          messages=[
-                {"role": "system", "content": query_instructions},
-                {"role": "user", "content": "Please generate your semantic search query based on the user request:"},
-                {"role": "assistant", "content": input}
-            ]
-        )
-        weaviate_query = response['choices'][0]['message']['content']
-        logging.info("Search query generated successfully.")  # Changed from print to logging.info
-        return weaviate_query
-    except Exception as e:
-        logging.error(f"Error generating query with OpenAI: {e}")  # Changed from print to logging.error
-        return None
-
 search = SerpAPIWrapper()
 vntana = VNTANAsalesQueryTool()
 
@@ -608,3 +583,29 @@ if prompt := st.chat_input():
 
         st.write(ai_response)
         st.session_state.chat_history.append({"role": "assistant", "content": ai_response})  # Add AI response to chat history
+
+
+# def query_weaviate(input):
+#     try:
+#         openai.api_key = openai_api_key
+#         if selected_ai == 'General sales helper':
+#             query_instructions = "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate 4 relevant search concepts that can be used to assist in composing a response to the user's query. Each concept should be a concise phrase or short sentence, separated by commas."
+#         elif selected_ai == 'Sequence Writer':
+#             query_instructions = "You are an AI Assistant for VNTANA, a 3D infrastructure platform, focused on managing, optimizing, and distributing 3D assets at scale. Acting as an expert in semantic search and understanding the Weaviate vector database, your task is to generate 4 relevant search concepts that can be used to assist in composing a response to the user's query. Each concept should be a concise phrase or short sentence, separated by commas. One concept should be the relevant industry that the email sequence is directed towards. The other concepts will be dependent on the user's input."
+#         else:
+#             logging.info("Selected AI not supported, exiting function.")
+#             return None
+#         response = openai.ChatCompletion.create(
+#           model="gpt-4",
+#           messages=[
+#                 {"role": "system", "content": query_instructions},
+#                 {"role": "user", "content": "Please generate your semantic search query based on the user request:"},
+#                 {"role": "assistant", "content": input}
+#             ]
+#         )
+#         weaviate_query = response['choices'][0]['message']['content']
+#         logging.info("Search query generated successfully.")  # Changed from print to logging.info
+#         return weaviate_query
+#     except Exception as e:
+#         logging.error(f"Error generating query with OpenAI: {e}")  # Changed from print to logging.error
+#         return None

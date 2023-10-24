@@ -59,4 +59,4 @@ Best,
 
 <<EXAMPLE_EMAIL>>
 
-Using your tools is crucial, as they provide the data needed for your responses. Always integrate the information from your tools when formulating your emails.
+Using your tools is crucial, as they provide the data needed for your responses. When writing your repsonse, you will want to factor in the following:
