@@ -112,7 +112,7 @@ else:
     None
 
 # Fetch the persona text for the selected industry
-persona_text = industries_df.loc[industries_df['Industry'] == selected_industry, 'B2B'].values[0]  # Fetching the 'B2B' persona as an example
+persona_text = industries_df.loc[industries_df['Industry'] == selected_industry, selected_persona].values[0]
 
 # Create a selectbox to let the user choose an industry
 selected_industry = st.selectbox('Choose an Industry:', industries_df['Industry'].tolist())
