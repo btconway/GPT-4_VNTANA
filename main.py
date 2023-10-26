@@ -84,7 +84,15 @@ selected_ai = st.selectbox('Choose AI Type:', ai_options)
 
 if selected_ai == 'Sequence Writer':
     # Read the Industries.csv file to get the list of industries and personas
-    industries_df = pd.read_csv('Industries.csv')
+
+# Initialize industries_df using an absolute path and check if it's empty
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(script_dir, 'Industries.csv')
+    industries_df = pd.read_csv(csv_path)
+    
+if industries_df.empty:
+    raise ValueError("The Industries.csv file is empty or not properly formatted.")
+
 
 
     # Create a selectbox to let the user choose an industry
