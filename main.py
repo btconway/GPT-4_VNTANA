@@ -82,21 +82,19 @@ ai_options = ['General sales helper', 'Sequence Writer']
 selected_ai = st.selectbox('Choose AI Type:', ai_options)
 
 
-if selected_ai == 'Sequence Writer':
-    # Read the Industries.csv file to get the list of industries and personas
-
 # Initialize industries_df using an absolute path and check if it's empty
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    csv_path = os.path.join(script_dir, 'Industries.csv')
-    industries_df = pd.read_csv(csv_path)
+script_dir = os.path.dirname(os.path.abspath(__file__))
+csv_path = os.path.join(script_dir, 'Industries.csv')
+industries_df = pd.read_csv(csv_path)
     
 if industries_df.empty:
     raise ValueError("The Industries.csv file is empty or not properly formatted.")
 
-
+if selected_ai == 'Sequence Writer':
+    # Read the Industries.csv file to get the list of industries and personas
 
     # Create a selectbox to let the user choose an industry
-    selected_industry = st.selectbox('Choose an Industry:', industries_df['Industry'].tolist())
+    selected_industry = st.selectbox('Choose an Industry:', industries_df['\ufeffIndustry'].tolist())
     persona_options = ['DPC', 'eCommerce and advertising', 'B2B', 'IT']
     selected_persona = st.selectbox('Choose persona:', persona_options)
     persona_file_name = selected_persona.replace(" ", "_") + ".txt"
@@ -121,13 +119,13 @@ else:
 
 # Fetch the persona text for the selected industry
 # Check if DataFrame is empty and handle accordingly
-if not industries_df.loc[industries_df['Industry'] == selected_industry, selected_persona].empty:
-    persona_text = industries_df.loc[industries_df['Industry'] == selected_industry, selected_persona].values[0]
+if not industries_df.loc[industries_df['\ufeffIndustry'] == selected_industry, selected_persona].empty:
+    persona_text = industries_df.loc[industries_df['\ufeffIndustry'] == selected_industry, selected_persona].values[0]
 else:
     persona_text = 'No persona found for selected industry'
 
 # Create a selectbox to let the user choose an industry
-selected_industry = st.selectbox('Choose an Industry:', industries_df['Industry'].tolist())
+selected_industry = st.selectbox('Choose an Industry:', industries_df['\ufeffIndustry'].tolist())
 # Load the content of the selected file
 file_name = selected_ai.replace(" ", "_") + ".txt"
 
