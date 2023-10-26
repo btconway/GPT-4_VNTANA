@@ -106,7 +106,7 @@ if selected_ai == 'Sequence Writer':
         logging.error(f"File {persona_file_name} not found.")
         persona_content = ""
         # Check if DataFrame is empty and handle accordingly
-        
+
     if not industries_df.loc[industries_df['Industry'] == selected_industry, selected_persona].empty:
         persona_text = industries_df.loc[industries_df['Industry'] == selected_industry, selected_persona].values[0]
     else:
@@ -141,7 +141,7 @@ Response Format:
 {format_instructions}
 """
 elif selected_ai == 'Sequence Writer':
-    PREFIX = content + """The users thinks that the following information may be useful to you as it highlights some VNTANA's benefits for people who workin this industry:"""+ persona_content + """\n\n"""
+    PREFIX = content + """The users thinks that the following information may be useful to you as it highlights some VNTANA's benefits for people who workin this industry:"""+ persona_text + """\n\n"""
 
 FORMAT_INSTRUCTIONS ="""To use a tool, please use the following format:
 
