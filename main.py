@@ -112,7 +112,11 @@ else:
     None
 
 # Fetch the persona text for the selected industry
-persona_text = industries_df.loc[industries_df['Industry'] == selected_industry, selected_persona].values[0]
+# Check if DataFrame is empty and handle accordingly
+if not industries_df.loc[industries_df['Industry'] == selected_industry, selected_persona].empty:
+    persona_text = industries_df.loc[industries_df['Industry'] == selected_industry, selected_persona].values[0]
+else:
+    persona_text = 'No persona found for selected industry'
 
 # Create a selectbox to let the user choose an industry
 selected_industry = st.selectbox('Choose an Industry:', industries_df['Industry'].tolist())
@@ -620,4 +624,3 @@ if prompt := st.chat_input():
 #     except Exception as e:
 #         logging.error(f"Error generating query with OpenAI: {e}")  # Changed from print to logging.error
 #         return None
-
