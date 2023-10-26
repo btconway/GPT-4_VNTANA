@@ -142,7 +142,7 @@ Response Format:
 """
     print(PREFIX)
 elif selected_ai == 'Sequence Writer':
-    PREFIX = content + """The users thinks that the following information may be useful to you as it highlights some VNTANA's benefits for people who workin this industry:"""+ persona_text + """\n\n"""
+    PREFIX = content +  persona_text + """\n\n""" + "All of the text above is meant to help inform you in your writing. Here is the specific request from the user: \n\n" + """{input}\n\n"""
     st.write(PREFIX)
 
 FORMAT_INSTRUCTIONS ="""To use a tool, please use the following format:
