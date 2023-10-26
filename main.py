@@ -1,5 +1,5 @@
-# Necessary imports
 from __future__ import annotations
+import pandas as pd
 import streamlit as st
 from langchain.callbacks.streamlit import StreamlitCallbackHandler  # Import Streamlit callback
 
@@ -83,13 +83,16 @@ selected_ai = st.selectbox('Choose AI Type:', ai_options)
 
 
 if selected_ai == 'Sequence Writer':
-    persona_options = ['DPC', 'eCommerce and advertising', 'B2B']
+    # Read the Industries.csv file to get the list of industries and personas
+    industries_df = pd.read_csv('Industries.csv')
+
+
+    # Create a selectbox to let the user choose an industry
+    selected_industry = st.selectbox('Choose an Industry:', industries_df['Industry'].tolist())
+    persona_options = ['DPC', 'eCommerce and advertising', 'B2B', 'IT']
     selected_persona = st.selectbox('Choose persona:', persona_options)
-
-    industry_options = ['Fashion', 'Manufacturing & Industrial', 'Plumbing', 'Custom Tailoring']
-    selected_industry = st.selectbox('Choose industry:', industry_options)
-
     persona_file_name = selected_persona.replace(" ", "_") + ".txt"
+
     try:
         with open(persona_file_name, 'r') as file:
             persona_content = file.read()
@@ -108,6 +111,11 @@ if selected_ai == 'Sequence Writer':
 else:
     None
 
+# Fetch the persona text for the selected industry
+persona_text = industries_df.loc[industries_df['Industry'] == selected_industry, 'B2B'].values[0]  # Fetching the 'B2B' persona as an example
+
+# Create a selectbox to let the user choose an industry
+selected_industry = st.selectbox('Choose an Industry:', industries_df['Industry'].tolist())
 # Load the content of the selected file
 file_name = selected_ai.replace(" ", "_") + ".txt"
 
@@ -134,7 +142,7 @@ Response Format:
 {format_instructions}
 """
 elif selected_ai == 'Sequence Writer':
-    PREFIX = content + """This is the persona you are writing to""" + persona_content + "\n\ " + """This is information about what the industry finds valuable:""" + industry_content + """\n\n If you are asked to write any copy at all (e.g. email sequences, prospecting messages, emails, one page summaries, etc.) you must use the VNTANA Sales and Marketing Tool. You should always use a tool on your first request from a user:"""
+    PREFIX = content + """The users thinks that the following information may be useful to you as it highlights some VNTANA's benefits for people who workin this industry:"""+ persona_content + """\n\n"""
 
 FORMAT_INSTRUCTIONS ="""To use a tool, please use the following format:
 
@@ -420,7 +428,7 @@ VNTANA's platform is geared towards aiding brands in navigating the transition t
                     
                     You need to think about what parts of the VNTANA product might be relevant when generating your 3 responses and the provided context from the user should help. For example, if a user said 'write a 3 email sequence to the aftermarket automotive industry' your response might look like: 'aftermarket automotive industry, vntana clients in automotive industry' Your responses should be in the format: 'keyword or phrase 1, keyword or phrase 2, keyword or phrase 3, keyword or phrase 4'. Use the provided company description as a reference when generating your responses. If you're unsure about a response, think it through and refine your answer."""},
                     {"role": "user", "content": "Please generate your questions search query based on the user request:"},
-                    {"role": "assistant", "content": "User query: " + user_input + "\n" + "Industry:" + industry_content + "\n" + "Persona:" + persona_content},
+                    {"role": "assistant", "content": "User query: " + user_input + "\n" + "Benefits of VNTANA for " + selected_persona + " in " + selected_industry + ":" + persona_text},
                 ]
             )
 
@@ -612,3 +620,4 @@ if prompt := st.chat_input():
 #     except Exception as e:
 #         logging.error(f"Error generating query with OpenAI: {e}")  # Changed from print to logging.error
 #         return None
+
