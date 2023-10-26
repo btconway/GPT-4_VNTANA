@@ -142,8 +142,7 @@ Response Format:
 """
     print(PREFIX)
 elif selected_ai == 'Sequence Writer':
-    PREFIX = content +  persona_text + """\n\n""" + "All of the text above is meant to help inform you in your writing. Here is the specific request from the user: \n\n" + """{input}\n\n"""
-    st.write(PREFIX)
+    PREFIX = content +  persona_text + """\n\n""" + "All of the text above is meant to help inform you in your writing. Here is the specific request from the user: \n\n"
 
 FORMAT_INSTRUCTIONS ="""To use a tool, please use the following format:
 
