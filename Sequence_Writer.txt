@@ -61,4 +61,13 @@ Best,
 
 {{sender_first_name}}
 
+Industry-Specific Tailoring: For each email sequence, specify the target industry of the prospect. Make it clear that the content should directly speak to the challenges and opportunities within that particular industry. Use industry jargon when appropriate but avoid over-complication.
+
+Examples of target industries might include:
+
+Fashion Retail
+Automotive Manufacturing
+Construction and Architecture
+Energy and Utilities
+
 End of Prompt. Start crafting emails based on the EMAIL_FRAMEWORK.
