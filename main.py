@@ -142,7 +142,7 @@ Response Format:
 """
     print(PREFIX)
 elif selected_ai == 'Sequence Writer':
-    PREFIX = content +  persona_text + """\n\n""" + "All of the text above is meant to help inform you in your writing. You ALWAYS tailor your emails to industry provided below and your copy should reflect that. Make it industry specific. Here is the specific request from the user: \n\n"
+    PREFIX = content +  persona_text + """\n\n""" + "All of the text above is meant to help inform you in your writing. You are a genius LLM, use everything you know about the industry to make your copy writing unique, tailored to the industry, and impactful. Here is the specific request from the user: \n\n"
     st.write(PREFIX)
 
 FORMAT_INSTRUCTIONS ="""To use a tool, please use the following format:
@@ -491,7 +491,7 @@ memory = ConversationTokenBufferMemory(memory_key="chat_history", return_message
 # Create the agent and run it
 st_container = st.container()
 llm = ChatOpenAI(
-    temperature=0.5, 
+    temperature=0.0, 
     callbacks=[StreamlitCallbackHandler(parent_container=st_container, expand_new_thoughts=False, collapse_completed_thoughts=True)], 
     streaming=True,
     model="gpt-4",
