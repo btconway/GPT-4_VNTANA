@@ -78,7 +78,7 @@ client = weaviate.Client(
         "X-Openai-Api-Key": openai_api_key}
 )
 
-ai_options = ['General sales helper', 'Sequence Writer']
+ai_options = ['Sequence Writer', 'General sales helper']
 selected_ai = st.selectbox('Choose AI Type:', ai_options)
 
 
@@ -105,27 +105,16 @@ if selected_ai == 'Sequence Writer':
     except FileNotFoundError:
         logging.error(f"File {persona_file_name} not found.")
         persona_content = ""
-
-    # Load the content of the selected industry file
-    industry_file_name = selected_industry.replace(" ", "_") + ".txt"
-    try:
-        with open(industry_file_name, 'r') as file:
-            industry_content = file.read()
-    except FileNotFoundError:
-        logging.error(f"File {industry_file_name} not found.")
-        industry_content = ""
+        # Check if DataFrame is empty and handle accordingly
+        
+    if not industries_df.loc[industries_df['Industry'] == selected_industry, selected_persona].empty:
+        persona_text = industries_df.loc[industries_df['Industry'] == selected_industry, selected_persona].values[0]
+    else:
+        persona_text = 'No persona found for selected industry'
+    
 else:
     None
 
-# Fetch the persona text for the selected industry
-# Check if DataFrame is empty and handle accordingly
-if not industries_df.loc[industries_df['Industry'] == selected_industry, selected_persona].empty:
-    persona_text = industries_df.loc[industries_df['Industry'] == selected_industry, selected_persona].values[0]
-else:
-    persona_text = 'No persona found for selected industry'
-
-# Create a selectbox to let the user choose an industry
-selected_industry = st.selectbox('Choose an Industry:', industries_df['Industry'].tolist())
 # Load the content of the selected file
 file_name = selected_ai.replace(" ", "_") + ".txt"
 
