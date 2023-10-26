@@ -140,8 +140,10 @@ You should only respond in the format as described below:
 Response Format:
 {format_instructions}
 """
+    print(PREFIX)
 elif selected_ai == 'Sequence Writer':
     PREFIX = content + """The users thinks that the following information may be useful to you as it highlights some VNTANA's benefits for people who workin this industry:"""+ persona_text + """\n\n"""
+    st.write(PREFIX)
 
 FORMAT_INSTRUCTIONS ="""To use a tool, please use the following format:
 
