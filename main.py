@@ -142,9 +142,9 @@ Response Format:
 """
     print(PREFIX)
 elif selected_ai == 'Sequence Writer':
-    PREFIX = content +  persona_text + """\n\n""" + "All of the text above is meant to help inform you in your writing. Here is the specific request from the user: \n\n"
+    PREFIX = content +  persona_text + """\n\n""" + "All of the text above is meant to help inform you in your writing. You ALWAYS tailor your emails to industry provided below and your copy should reflect that. Make it industry specific. Here is the specific request from the user: \n\n"
     st.write(PREFIX)
-    
+
 FORMAT_INSTRUCTIONS ="""To use a tool, please use the following format:
 
 ```
