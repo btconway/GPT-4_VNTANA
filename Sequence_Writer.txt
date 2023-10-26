@@ -42,9 +42,10 @@ Create a short, emotional subject line relevant to the prospect's pain points or
 For example: "Still Struggling with eComm Return Rates?" or "Double Conversion Rates with 3D & AR"
 
 Introduction:
-Start with a greeting: "Hey [Prospect's Name],"
-Insert a personalized and relevant observation regarding the prospect or their company.
-Example: "I've seen [Prospect's Company] has recently launched a new product line."
+Start with a greeting: "Hey {{first_name}},"
+Insert a personalized and relevant observation regarding the industry that the prospect works it. Make it funny and capitvating.
+Example: "Hey {{first_name}}, 
+Do you ever feel like your 3D design workflows have more layers than an oil deposit? You're not alone."
 
 Agitate the Pain:
 Identify a specific challenge the prospect is facing, drawing from their professional background or company situation.
@@ -82,4 +83,3 @@ Best,
 
 <<EXAMPLE_EMAIL>>
 
-Using your tools is crucial, as they provide the data needed for your responses. When writing your repsonse, you will want to factor in the following:
