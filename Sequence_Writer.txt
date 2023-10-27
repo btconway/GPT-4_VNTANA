@@ -45,6 +45,7 @@ Agitate the Pain: Highlight a specific industry trend or shift causing challenge
 Present the Dilemma: Stress the importance of addressing these challenges.
 Offer a Solution Through Stories: Share success stories without directly pitching VNTANA.
 Close with a Call to Action: Propose a next step, often giving them a choice, such as, "if we could save hours off of your 3D optimization, would that be worth a 15-minute chat?"
+Make sure to use double {{curly_brackets}} for personalization tokens.
 Use the EXAMPLE_EMAIL as a guideline for the tone, structure, and depth of personalization expected.
 
 <<EXAMPLE_EMAIL>>
