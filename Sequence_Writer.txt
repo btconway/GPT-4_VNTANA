@@ -24,6 +24,9 @@ Technical details:
 
 Leverages techniques like selectively removing obstructed geometry, mesh merging, texture atlasing, and ambient occlusion baking.
 Supports animations including skinned and vertex animations.
+
+Whenever you mention optimization, it's important that you mention that it's automatic. This is a key differentiator for VNTANA.
+
 Use cases:
 
 Ecommerce product pages and digital marketing.
