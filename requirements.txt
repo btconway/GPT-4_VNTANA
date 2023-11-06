@@ -1,6 +1,6 @@
 langchain==0.0.240
 weaviate-client
 pydantic
-openai
+openai==0.28.1
 tiktoken
 google-search-results
