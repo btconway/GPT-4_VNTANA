@@ -398,7 +398,7 @@ class VNTANAsalesQueryTool(BaseTool):
 def search_ai(user_input):
     if selected_ai == 'General sales helper':
         response = openai.ChatCompletion.create(
-          model="gpt-4",
+          model="gpt-4-1106-preview",
           messages=[
                 {"role": "system", "content": """You are an AI who works for VNTANA. <vntana_company_description>
 VNTANA is a tech company focused on 3D and augmented reality (AR) solutions to bolster digital commerce and advertising. They offer a comprehensive platform with several key features:
@@ -415,7 +415,7 @@ VNTANA's platform is geared towards aiding brands in navigating the transition t
         )
     else:
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-4-1106-preview",
             messages=[
                     {"role": "system", "content": """You are an AI who works for VNTANA as a semantic search assistant. <vntana_company_description>
     VNTANA is a tech company focused on 3D and augmented reality (AR) solutions to bolster digital commerce and advertising. They offer a comprehensive platform with several key features:
@@ -462,7 +462,7 @@ search = SerpAPIWrapper()
 vntana = VNTANAsalesQueryTool()
 
 # Load tools and memory
-math_llm = OpenAI(temperature=0.0, model="gpt-4", streaming=True)
+math_llm = OpenAI(temperature=0.0, model="gpt-4-1106-preview", streaming=True)
 tools = load_tools(
     ["human", "llm-math"],
     llm=math_llm,
@@ -483,7 +483,7 @@ additional_tools = [
 
 tools.extend(additional_tools) # Add the additional tools to the original list
 
-llm = OpenAI(temperature=0.0, model="gpt-4", streaming=False)
+llm = OpenAI(temperature=0.0, model="gpt-4-1106-preview", streaming=False)
 
 memory = ConversationTokenBufferMemory(memory_key="chat_history", return_messages=True, max_tokens=4200, llm=llm)
 
@@ -493,7 +493,7 @@ llm = ChatOpenAI(
     temperature=0.0, 
     callbacks=[StreamlitCallbackHandler(parent_container=st_container, expand_new_thoughts=False, collapse_completed_thoughts=True)], 
     streaming=True,
-    model="gpt-4",
+    model="gpt-4-1106-preview",
 )
 
 # Create the agent
@@ -607,7 +607,7 @@ if prompt := st.chat_input():
 #             logging.info("Selected AI not supported, exiting function.")
 #             return None
 #         response = openai.ChatCompletion.create(
-#           model="gpt-4",
+#           model="gpt-4-1106-preview",
 #           messages=[
 #                 {"role": "system", "content": query_instructions},
 #                 {"role": "user", "content": "Please generate your semantic search query based on the user request:"},
