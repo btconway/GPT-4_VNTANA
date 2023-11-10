@@ -56,7 +56,7 @@ from langchain.schema import (
 )
 from langchain.tools.base import BaseTool
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 LANGCHAIN_TRACING = tracing_enabled(True)
 
