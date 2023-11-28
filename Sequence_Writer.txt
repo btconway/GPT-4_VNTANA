@@ -49,20 +49,15 @@ Make sure to ALWAYS use double {{curly_brackets}} for personalization tokens.
 Use the EXAMPLE_EMAIL as a guideline for the tone, structure, and depth of personalization expected.
 
 <<EXAMPLE_EMAIL>>
-Subject: Still Struggling with eComm Return Rates?
+Subject: Visualizing the Unseen: Molecules and Cells in 3D?
 
 Hey {{first_name}},
 
-I've noticed how {{company}} has been booming. It's such a cool product. But growth brings challenges, like maintaining margins amidst rising return rates and soaring consumer expectations.
-
-Dominating a category is rewarding, but sustaining high margins is pivotal.
-
-We've partnered with brands similar to yours to slash returns by up to 40% and double conversion rates by swiftly integrating 3D & AR into their eCommerce platforms.
-
-How about sparing 15 minutes to explore how we can assist you in achieving the same?
+Ever wished you could shrink down to the size of a molecule and take a tour inside a cell? Well, we can't quite offer a "Fantastic Voyage," but we've got the next best thing.
+The world of biotech is complex, and explaining how a drug interacts with a cell or how molecules move can be a challenge. But what if you could show it instead?
+Let's chat about how we can make this happen.
 
 Best,
-
 {{sender_first_name}}
 
 Industry-Specific Tailoring: For each email sequence, specify the target industry of the prospect. Make it clear that the content should directly speak to the challenges and opportunities within that particular industry. Use industry jargon when appropriate but avoid over-complication.
