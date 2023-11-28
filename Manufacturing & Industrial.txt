@@ -1,6 +1,0 @@
- • Manufacturing, Industrial, and other related industries
-   • Automatically optimize large CAD files so they can be shared with anyone in 3D and Ar via an embeddable 3D web viewer or simple embed link
-   • Collaborate on large 3D files in a web-based environment that's DCC agnostic
-   • Easily create custom interactive experiences to highlight your product's benefits and features to prospective buyers
-   • No need to bring large equipment to trade shows
-   • Use VNTANA's showrooms to present 3D versions of products to buyers and allow them to interact with products and leave feedback
