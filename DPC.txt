@@ -1,0 +1,31 @@
+Digital Product Creation (DPC) Persona:
+
+Goals and Challenges:
+
+Streamline 3D digital design workflows
+Enable use of 3D assets across departments
+Reduce time spent manually optimizing 3D files
+Automate publishing 3D assets to various channels
+Maintain brand visual identity in 3D models
+
+
+Day-to-Day:
+
+Oversees 3D design software and asset management
+Works with designers on 3D product design
+Prepares 3D assets for use in marketing, ecommerce, AR/VR
+Maintains 3D model quality and efficiency
+Pain Points:
+
+Very manual process to prepare 3D for different uses
+Each department has unique 3D requirements
+Hard to maintain consistency across 3D assets
+Creative direction limited by 3D model optimization
+
+Need:
+
+Automated 3D optimization for different uses
+Central 3D asset management and distribution
+Maintain look and feel after 3D optimization
+Single click publishing to marketing, web, social media
+Analytics on 3D asset usage and performance
