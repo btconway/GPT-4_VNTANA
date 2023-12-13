@@ -462,10 +462,8 @@ search = SerpAPIWrapper()
 vntana = VNTANAsalesQueryTool()
 
 # Load tools and memory
-math_llm = OpenAI(temperature=0.0, model="gpt-4-1106-preview", streaming=True)
 tools = load_tools(
-    ["human", "llm-math"],
-    llm=math_llm,
+    ["human"],
 )
 
 additional_tools = [
