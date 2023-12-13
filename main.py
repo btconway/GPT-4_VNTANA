@@ -55,12 +55,13 @@ from langchain.schema import (
     SystemMessage
 )
 from langchain.tools.base import BaseTool
+from openai import OpenAI
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 LANGCHAIN_TRACING = tracing_enabled(True)
 
-
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 # Get sensitive information from environment variables
 username = os.environ.get('WEAVIATE_USERNAME')
 password = os.environ.get('WEAVIATE_PASSWORD')
@@ -72,7 +73,7 @@ resource_owner_config = weaviate.AuthClientPassword(
     username=username,
     password=password,
 )
-client = weaviate.Client(
+weaviate_client = weaviate.Client(
     "https://qkkaupkrrpgbpwbekvzvw.gcp-c.weaviate.cloud", auth_client_secret=resource_owner_config,
      additional_headers={
         "X-Openai-Api-Key": openai_api_key}
@@ -376,7 +377,7 @@ class VNTANAsalesQueryTool(BaseTool):
             vectors_list = vectorize(search_ai(query))
             logging.info(vectors_list)
             for vector in vectors_list:  # Loop through each vector dictionary
-                resp = client.query.get(class_name, ["content"]).with_near_vector(vector).with_autocut(1).with_limit(1).do()
+                resp = weaviate_client.query.get(class_name, ["content"]).with_near_vector(vector).with_autocut(1).with_limit(1).do()
                 resp = self.truncate_response(resp)  # Truncate the response if it exceeds 1200 characters
                 results.append(resp)
                 logging.info(resp)
@@ -397,7 +398,7 @@ class VNTANAsalesQueryTool(BaseTool):
 
 def search_ai(user_input):
     if selected_ai == 'General sales helper':
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
           model="gpt-4-1106-preview",
           messages=[
                 {"role": "system", "content": """You are an AI who works for VNTANA. <vntana_company_description>
@@ -414,7 +415,7 @@ VNTANA's platform is geared towards aiding brands in navigating the transition t
             ]
         )
     else:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4-1106-preview",
             messages=[
                     {"role": "system", "content": """You are an AI who works for VNTANA as a semantic search assistant. <vntana_company_description>
