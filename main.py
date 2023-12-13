@@ -220,7 +220,7 @@ class CustomOutputParser(AgentOutputParser):
 
 
 retry_parser = RetryWithErrorOutputParser.from_llm(
-    parser=CustomOutputParser(), llm=OpenAI(temperature=0)
+    parser=CustomOutputParser(), llm=OpenAI()
 )
 # Define the custom agent
 class CustomChatAgent(Agent):
